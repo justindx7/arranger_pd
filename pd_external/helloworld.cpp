@@ -72,6 +72,21 @@ void HelloWorld::onFloat(float input) {
     startpost("(float)Hello world: " );
     postfloat(input);
     endpost();
+    int inputInt = static_cast<int>(input);
+
+    if (data["programs"].contains(std::to_string(inputInt))) {
+      json program = data["programs"][std::to_string(inputInt)];
+      int bpm = program["bpm"];
+      std::string file = program["filename"];
+
+      startpost("Program ");
+      postfloat(input);
+      poststring(": BPM = ");
+      postfloat(bpm);
+      poststring(", File = ");
+      poststring(file.c_str());
+      endpost();
+    }
 }
 
 void HelloWorld::bangCallback(HelloWorld* x) {
