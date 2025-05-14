@@ -1,18 +1,64 @@
 #include "helloworld.h"
 #include "m_pd.h"
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <shlobj.h>
+#elif defined(__APPLE__) || defined(__linux__)
+#include <pwd.h>
+#include <unistd.h>
+#endif
+
+std::filesystem::path getDocumentsPath() {
+#if defined(_WIN32)
+    PWSTR pathTmp = nullptr;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &pathTmp))) {
+        std::wstring ws(pathTmp);
+        CoTaskMemFree(pathTmp);
+        return std::filesystem::path(ws);
+    } else {
+        throw std::runtime_error("Failed to find Documents folder on Windows");
+    }
+
+#elif defined(__APPLE__) || defined(__linux__)
+    const char* homeDir = getenv("HOME");
+    if (!homeDir) {
+        homeDir = getpwuid(getuid())->pw_dir;
+    }
+    return std::filesystem::path(homeDir) / "Documents";
+
+#else
+    throw std::runtime_error("Unsupported platform");
+#endif
+}
+
 
 namespace pd_helloworld {
 
 // Initialize the static class pointer
 t_class* HelloWorld::class_ptr_ = nullptr;
 
-// Constructor
 HelloWorld::HelloWorld() {
     post("Hello world object created");
-    // No additional initialization needed
+
+    const std::string songDataPath = getDocumentsPath().string() + "/songdata/";
+    const std::string filename = "example.json";
+
+    std::ifstream file(songDataPath + filename);
+
+    if (file.is_open()) {
+      json data = json::parse(file);
+      post(data.dump(4).c_str());
+    } else {
+      startpost("Error loading song data cannont find:");
+      poststring((songDataPath + filename).c_str());
+      endpost();
+    }
 }
 
-// Destructor
 HelloWorld::~HelloWorld() {
     post("Hello world object deleted");
 }
@@ -22,7 +68,6 @@ void HelloWorld::onBang() {
     post("Hello world !!!");
 }
 
-// Static wrapper for the bang method
 void HelloWorld::bangCallback(HelloWorld* x) {
     x->onBang();
 }

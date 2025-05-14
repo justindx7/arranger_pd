@@ -2,10 +2,12 @@
 
 #include <string>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include "m_pd.h"
 
 // C++ namespace to avoid name collisions
 namespace pd_helloworld {
+using json = nlohmann::json;
 
 // Class declaration
 class HelloWorld {
