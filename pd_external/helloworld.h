@@ -13,21 +13,22 @@ using json = nlohmann::json;
 class HelloWorld {
 private:
     t_object obj_; // The Pd object - must be first member
+    json data;
 
 public:
     // Static class pointer required by Pd
     static t_class* class_ptr_;
     
-    // Constructor & Destructor
     HelloWorld();
     ~HelloWorld();
     
-    // Bang handler method
     void onBang();
+    void onFloat(float input);
     
-    // Static wrapper for the bang method
-    static void bangCallback(HelloWorld* x);
+    // Static wrappers
     static void destroyCallback(HelloWorld* x);
+    static void bangCallback(HelloWorld* x);
+    static void floatCallback(HelloWorld* x, t_floatarg f);
     
     // Static creator function
     static void* create();
@@ -36,7 +37,7 @@ public:
     static void setup();
 };
 
-} // End namespace pd_helloworld
+} // end namespace 
 
 // External setup function (must be C-style for Pd's dynamic loading)
 extern "C" {

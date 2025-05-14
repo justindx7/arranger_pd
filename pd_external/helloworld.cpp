@@ -2,7 +2,6 @@
 #include "m_pd.h"
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -50,39 +49,48 @@ HelloWorld::HelloWorld() {
     std::ifstream file(songDataPath + filename);
 
     if (file.is_open()) {
-      json data = json::parse(file);
+      data = json::parse(file);
       post(data.dump(4).c_str());
+
     } else {
       startpost("Error loading song data cannont find:");
       poststring((songDataPath + filename).c_str());
       endpost();
     }
+
 }
 
 HelloWorld::~HelloWorld() {
     post("Hello world object deleted");
 }
 
-// Bang handler method
 void HelloWorld::onBang() {
-    post("Hello world !!!");
+    post("(bang)Hello world !!!");
+}
+
+void HelloWorld::onFloat(float input) {
+    startpost("(float)Hello world: " );
+    postfloat(input);
+    endpost();
 }
 
 void HelloWorld::bangCallback(HelloWorld* x) {
     x->onBang();
 }
 
+void HelloWorld::floatCallback(HelloWorld* x, t_floatarg f) {
+    x->onFloat(f);
+}
+
 void HelloWorld::destroyCallback(HelloWorld *x) {
     x->~HelloWorld();
 }
 
-// Static creator function
 void* HelloWorld::create() {
     // Use placement new to create the object at the memory location allocated by pd_new
     return (void*)(new (pd_new(class_ptr_)) HelloWorld());
 }
 
-// Static setup function - registers the class with Pd
 void HelloWorld::setup() {
     class_ptr_ = class_new(
         gensym("helloworld"),        // Object name
@@ -95,11 +103,11 @@ void HelloWorld::setup() {
     
     // Register methods
     class_addbang(class_ptr_, (t_method)bangCallback);
+    class_addfloat(class_ptr_, (t_method)floatCallback);
 }
 
-} // End namespace pd_helloworld
+} // End namespace 
 
-// External setup function (must be C-style for Pd's dynamic loading)
 extern "C" {
     void helloworld_setup() {
         pd_helloworld::HelloWorld::setup();
