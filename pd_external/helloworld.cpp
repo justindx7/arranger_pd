@@ -42,6 +42,8 @@ t_class* HelloWorld::class_ptr_ = nullptr;
 
 HelloWorld::HelloWorld() {
     post("Hello world object created");
+    out_A = outlet_new(&obj_, &s_float);
+    out_B = outlet_new(&obj_, &s_symbol);
 
     const std::string songDataPath = getDocumentsPath().string() + "/songdata/";
     const std::string filename = "example.json";
@@ -61,11 +63,14 @@ HelloWorld::HelloWorld() {
 }
 
 HelloWorld::~HelloWorld() {
+    outlet_free(out_A);
+    outlet_free(out_B);
     post("Hello world object deleted");
 }
 
 void HelloWorld::onBang() {
     post("(bang)Hello world !!!");
+
 }
 
 void HelloWorld::onFloat(float input) {
@@ -86,6 +91,12 @@ void HelloWorld::onFloat(float input) {
       poststring(", File = ");
       poststring(file.c_str());
       endpost();
+
+      t_float bpmFloat = static_cast<t_float>(bpm);
+      outlet_float(out_A, bpmFloat);
+
+      t_symbol *symB = gensym(file.c_str());
+      outlet_symbol(out_B, symB);
     }
 }
 
@@ -119,6 +130,8 @@ void HelloWorld::setup() {
     // Register methods
     class_addbang(class_ptr_, (t_method)bangCallback);
     class_addfloat(class_ptr_, (t_method)floatCallback);
+
+
 }
 
 } // End namespace 

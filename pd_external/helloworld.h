@@ -13,6 +13,7 @@ using json = nlohmann::json;
 class HelloWorld {
 private:
     t_object obj_; // The Pd object - must be first member
+    t_outlet *out_A, *out_B; 
     json data;
 
 public:
