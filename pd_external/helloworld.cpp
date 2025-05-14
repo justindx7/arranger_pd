@@ -27,6 +27,10 @@ void HelloWorld::bangCallback(HelloWorld* x) {
     x->onBang();
 }
 
+void HelloWorld::destroyCallback(HelloWorld *x) {
+    x->~HelloWorld();
+}
+
 // Static creator function
 void* HelloWorld::create() {
     // Use placement new to create the object at the memory location allocated by pd_new
@@ -38,7 +42,7 @@ void HelloWorld::setup() {
     class_ptr_ = class_new(
         gensym("helloworld"),        // Object name
         (t_newmethod)create,         // Constructor
-        0,                           // No special destructor
+        (t_method)destroyCallback,   // callback to c++ destructor 
         sizeof(HelloWorld),          // Size of the data structure
         CLASS_DEFAULT,               // Normal Pd object
         (t_atomtype)0                // No creation arguments

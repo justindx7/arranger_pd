@@ -25,6 +25,7 @@ public:
     
     // Static wrapper for the bang method
     static void bangCallback(HelloWorld* x);
+    static void destroyCallback(HelloWorld* x);
     
     // Static creator function
     static void* create();
