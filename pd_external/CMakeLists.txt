@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
-project(helloworld_pd_external VERSION 1.0.0 LANGUAGES CXX)
+project(songdataselector_pd_external VERSION 1.0.0 LANGUAGES CXX)
 
-# Use C++11 standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Set default build type to Release
@@ -21,44 +20,48 @@ else()
   message(FATAL_ERROR "Platform not supported")
 endif()
 
+#search for nlohmann json
+find_package(nlohmann_json REQUIRED)
 
 # Create the external library
-add_library(helloworld MODULE
-  helloworld.cpp
-  helloworld.h
+add_library(songdataselector MODULE
+  songdataselector.cpp
+  songdataselector.h
 )
 
+target_link_libraries(songdataselector PRIVATE nlohmann_json::nlohmann_json)
+
 # Set the output name and properties
-set_target_properties(helloworld PROPERTIES
+set_target_properties(songdataselector PROPERTIES
   PREFIX ""
-  OUTPUT_NAME "helloworld"
+  OUTPUT_NAME "songdataselector"
   SUFFIX ".${EXTENSION}"
 )
 
 # Include Pure Data headers
-target_include_directories(helloworld PRIVATE ${PD_INCLUDE_DIR})
+target_include_directories(songdataselector PRIVATE ${PD_INCLUDE_DIR})
 
 # Platform specific flags and settings
 if(APPLE)
-  target_link_options(helloworld PRIVATE -undefined dynamic_lookup -bundle)
+  target_link_options(songdataselector PRIVATE -undefined dynamic_lookup -bundle)
 elseif(UNIX)
-  target_link_options(helloworld PRIVATE -shared -Wl,--export-dynamic)
+  target_link_options(songdataselector PRIVATE -shared -Wl,--export-dynamic)
 endif()
 
 # Set compiler flags
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(helloworld PRIVATE -Wall -Wextra -fPIC)
+  target_compile_options(songdataselector PRIVATE -Wall -Wextra -fPIC)
 endif()
 
 # Define PD macro
-target_compile_definitions(helloworld PRIVATE PD)
+target_compile_definitions(songdataselector PRIVATE PD)
 
 # Installation
 
 # Add strip rule for Release builds
 if(CMAKE_BUILD_TYPE MATCHES "Release")
-  add_custom_command(TARGET helloworld POST_BUILD
-    COMMAND ${CMAKE_STRIP} $<TARGET_FILE:helloworld>
+  add_custom_command(TARGET songdataselector POST_BUILD
+    COMMAND ${CMAKE_STRIP} $<TARGET_FILE:songdataselector>
   )
 endif()
 

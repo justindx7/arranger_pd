@@ -1,4 +1,4 @@
-#include "helloworld.h"
+#include "songdataselector.h"
 #include "m_pd.h"
 #include <filesystem>
 #include <fstream>
@@ -35,14 +35,14 @@ std::filesystem::path getDocumentsPath() {
 }
 
 
-namespace pd_helloworld {
+namespace pd_songdataselector {
 
 // Initialize the static class pointer
-t_class* HelloWorld::class_ptr_ = nullptr;
+t_class* SongDataSelector::class_ptr_ = nullptr;
 
-HelloWorld::HelloWorld() {
+SongDataSelector::SongDataSelector() {
     post("Hello world object created");
-    out_A = outlet_new(&obj_, &s_float);
+    out_BPM = outlet_new(&obj_, &s_float);
     out_B = outlet_new(&obj_, &s_symbol);
 
     const std::string songDataPath = getDocumentsPath().string() + "/songdata/";
@@ -62,18 +62,18 @@ HelloWorld::HelloWorld() {
 
 }
 
-HelloWorld::~HelloWorld() {
-    outlet_free(out_A);
+SongDataSelector::~SongDataSelector() {
+    outlet_free(out_BPM);
     outlet_free(out_B);
     post("Hello world object deleted");
 }
 
-void HelloWorld::onBang() {
+void SongDataSelector::onBang() {
     post("(bang)Hello world !!!");
 
 }
 
-void HelloWorld::onFloat(float input) {
+void SongDataSelector::onFloat(float input) {
     startpost("(float)Hello world: " );
     postfloat(input);
     endpost();
@@ -93,36 +93,36 @@ void HelloWorld::onFloat(float input) {
       endpost();
 
       t_float bpmFloat = static_cast<t_float>(bpm);
-      outlet_float(out_A, bpmFloat);
+      outlet_float(out_BPM, bpmFloat);
 
       t_symbol *symB = gensym(file.c_str());
       outlet_symbol(out_B, symB);
     }
 }
 
-void HelloWorld::bangCallback(HelloWorld* x) {
+void SongDataSelector::bangCallback(SongDataSelector* x) {
     x->onBang();
 }
 
-void HelloWorld::floatCallback(HelloWorld* x, t_floatarg f) {
+void SongDataSelector::floatCallback(SongDataSelector* x, t_floatarg f) {
     x->onFloat(f);
 }
 
-void HelloWorld::destroyCallback(HelloWorld *x) {
-    x->~HelloWorld();
+void SongDataSelector::destroyCallback(SongDataSelector *x) {
+    x->~SongDataSelector();
 }
 
-void* HelloWorld::create() {
+void* SongDataSelector::create() {
     // Use placement new to create the object at the memory location allocated by pd_new
-    return (void*)(new (pd_new(class_ptr_)) HelloWorld());
+    return (void*)(new (pd_new(class_ptr_)) SongDataSelector());
 }
 
-void HelloWorld::setup() {
+void SongDataSelector::setup() {
     class_ptr_ = class_new(
-        gensym("helloworld"),        // Object name
+        gensym("songdataselector"),   // Object name
         (t_newmethod)create,         // Constructor
         (t_method)destroyCallback,   // callback to c++ destructor 
-        sizeof(HelloWorld),          // Size of the data structure
+        sizeof(SongDataSelector),    // Size of the data structure
         CLASS_DEFAULT,               // Normal Pd object
         (t_atomtype)0                // No creation arguments
     );
@@ -137,8 +137,8 @@ void HelloWorld::setup() {
 } // End namespace 
 
 extern "C" {
-    void helloworld_setup() {
-        pd_helloworld::HelloWorld::setup();
+    void songdataselector_setup() {
+        pd_songdataselector::SongDataSelector::setup();
     }
 }
 
