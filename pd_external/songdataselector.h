@@ -13,7 +13,12 @@ using json = nlohmann::json;
 class SongDataSelector {
 private:
     t_object obj_; // The Pd object - must be first member
-    t_outlet *out_BPM, *out_B; 
+    t_outlet *out_songBPM,*out_fileBPM;
+
+    t_outlet *out_section[15];
+
+    //t_outlet *out_intro, *out_verse1, *out_verse2,*out_verse3, *out_fillin1, *out_fillin2, *out_outro;
+    //t_outlet *out_sample1, *out_sample2, *out_sample3, *out_sample4, *out_sample5, *out_sample6, *out_sample7, *out_sample8;
     json data;
 
 public:
@@ -25,6 +30,8 @@ public:
     
     void onBang();
     void onFloat(float input);
+    void initOutlets();
+    void freeOutlets();
     
     // Static wrappers
     static void destroyCallback(SongDataSelector* x);
