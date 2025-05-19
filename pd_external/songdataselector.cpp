@@ -176,8 +176,14 @@ void SongDataSelector::onFloat(float input) {
       const auto &val = sections[key];
       if (val.is_string()) {
         poststring(val.get<std::string>().c_str());
-        t_symbol *symB = gensym(val.get<std::string>().c_str());
-        outlet_symbol(out_section[index-1], symB);
+
+        if (val.get<std::string>() == "") {
+          t_symbol *symB = gensym("empty");
+          outlet_symbol(out_section[index - 1], symB);
+        } else {
+          t_symbol *symB = gensym(val.get<std::string>().c_str());
+          outlet_symbol(out_section[index - 1], symB);
+        }
 
       } else if (val.is_number_integer()) {
         postfloat(val.get<int>());
