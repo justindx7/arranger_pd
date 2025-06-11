@@ -3,3 +3,6 @@
 .DS_Store
 /juce_app/build
 /juce_app/.cache
+juce_app/.vscode/launch.json
+.gitignore
+juce_app/.vscode/tasks.json

@@ -1,5 +1,4 @@
 #include "PluginProcessor.h"
-#include "juce_gui_extra/juce_gui_extra.h"
 #include "PluginEditor.h"
 
 //==============================================================================
@@ -87,7 +86,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     
     //set the size of the app
     setSize (1412 , 1000); 
-    setResizable(true, true);
+    //setResizable(true, true);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -104,10 +103,11 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.setFont (15.0f);
     g.drawFittedText ("Arranger", getLocalBounds(), juce::Justification::topLeft, 1);
 }
+
 void AudioPluginAudioProcessorEditor::resized()
 {
     // Define individual spacings for each group
-    const int sampleSpacing = 15;
+
     const int fillSpacing = 30;
     const int verseSpacing = 30;
     const int editSpacing = 15;
@@ -115,7 +115,10 @@ void AudioPluginAudioProcessorEditor::resized()
 
     // Sample buttons
     const int numSampleColumns = 4;
-    const int sampleButtonSize = 150;
+    // Make sampleButtonSize scale proportionally with the window size
+    const int sampleSpacing = 15;
+    int minDimension = std::min(getWidth(), getHeight());
+    int sampleButtonSize = juce::jlimit(80, 450, minDimension / 8); // Clamp between 80 and 450 pixels
     int totalSampleWidth = numSampleColumns * sampleButtonSize + (numSampleColumns - 1) * sampleSpacing;
     int sampleX0 = (getWidth() - totalSampleWidth) / 2;
     int sampleY0 = 40;
