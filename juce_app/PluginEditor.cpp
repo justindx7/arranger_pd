@@ -196,4 +196,10 @@ void AudioPluginAudioProcessorEditor::resized()
     }
     // Position the tempo label above the tempo slider
     tempoLabel.setBounds(tempoSlider.getX(), tempoSlider.getY() - 20, tempoSlider.getWidth(), 20);
+
+    // Reverb slider
+    // Place the reverb slider below the tempo slider
+    reverbSlider.setBounds(tempoSlider.getX(), tempoSlider.getBottom() + 10, tempoSlider.getWidth(), 30);
+    // Position the reverb label above the reverb slider
+    reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - 20, reverbSlider.getWidth(), 20);
 }
