@@ -1,0 +1,1 @@
+Deze folder is voor GUI objecten

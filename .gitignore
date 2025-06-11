@@ -1,2 +1,5 @@
 /pd_external/out
 /pd_external/.cache
+.DS_Store
+/juce_app/build
+/juce_app/.cache

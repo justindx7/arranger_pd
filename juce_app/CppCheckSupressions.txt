@@ -1,0 +1,12 @@
+// JUCE-specific template suppressions
+unmatchedSuppression
+//missingInclude
+noExplicitConstructor:*juce*.h
+unusedStructMember:*juce*.h
+uninitMemberVar:*juce*.h
+// Common JUCE patterns that trigger warnings
+passedByValue:*Lambda*
+useInitializationList:*Component.cpp
+// JUCE listener patterns
+unusedPrivateFunction:*Listener*
+virtualCallInConstructor:*Component*
