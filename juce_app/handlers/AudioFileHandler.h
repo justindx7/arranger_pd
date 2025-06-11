@@ -12,7 +12,7 @@ public:
     void loadSample();
     void playSample();
     double getSampleLengthInSec();
-
+    void setSample(const juce::String &fileLocation);
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
 private:

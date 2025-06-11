@@ -46,6 +46,11 @@ void AudioFileHandler::changeListenerCallback(juce::ChangeBroadcaster *source) {
   }
 }
 
+
+void AudioFileHandler::setSample(const juce::String &fileLocation) {
+    fileName = fileLocation;
+}
+
 void AudioFileHandler::loadSample() {
     needsLoading = true;
 
@@ -55,8 +60,10 @@ void AudioFileHandler::loadSample() {
         transportSource.setSource(nullptr);
         readerSource.reset();
 
-        auto testFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
-                            .getChildFile("songdata/test.wav");
+        //auto testFile = juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+                            //.getChildFile("songdata/test.wav");
+
+        auto testFile = juce::File(fileName);
 
         if (testFile.existsAsFile()) {
             std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(testFile));
