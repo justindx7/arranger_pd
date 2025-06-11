@@ -23,11 +23,16 @@ file(GLOB HANDLER_FILES
     "handlers/*.cpp"
 )
 
+file(GLOB GUI_FILES    
+    "gui/*.cpp"
+)
+
 target_sources(Arranger
         PRIVATE
         PluginEditor.cpp
         PluginProcessor.cpp
         ${HANDLER_FILES}
+        ${GUI_FILES}
         )
 
         target_compile_definitions(Arranger
@@ -76,6 +81,7 @@ if (CMAKE_CXX_CPPCHECK)
             ${CMAKE_SOURCE_DIR}/PluginEditor.cpp
             ${CMAKE_SOURCE_DIR}/PluginProcessor.cpp
             ${CMAKE_SOURCE_DIR}/${HANDLER_FILES}
+            ${CMAKE_SOURCE_DIR}/${GUI_FILES}
     )
 
 endif()
