@@ -71,16 +71,17 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     reverbSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, false, 0, 0);
     reverbSlider.setRange(0.0, 100.0, 0.1);
     reverbSlider.setValue(0.0); // Default value at 50%
+    reverbSlider.setTextValueSuffix("%");
 
     // Add reverb slider label
     addAndMakeVisible(reverbLabel);
-    reverbLabel.setText("Reverb", juce::dontSendNotification);
+    reverbLabel.setText("Reverb 0%", juce::dontSendNotification);
     reverbLabel.setJustificationType(juce::Justification::centred);
 
     // update the label when slider value changes
     reverbSlider.onValueChange = [this] {
         double reverbValue = reverbSlider.getValue();
-        reverbLabel.setText(juce::String(reverbValue, 1), juce::dontSendNotification);
+        reverbLabel.setText("Reverb " + juce::String(reverbValue, 1) + "%", juce::dontSendNotification);
     };
     
     
@@ -198,8 +199,17 @@ void AudioPluginAudioProcessorEditor::resized()
     tempoLabel.setBounds(tempoSlider.getX(), tempoSlider.getY() - 20, tempoSlider.getWidth(), 20);
 
     // Reverb slider
-    // Place the reverb slider below the tempo slider
-    reverbSlider.setBounds(tempoSlider.getX(), tempoSlider.getBottom() + 10, tempoSlider.getWidth(), 30);
-    // Position the reverb label above the reverb slider
-    reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - 20, reverbSlider.getWidth(), 20);
+    // Place the reverb slider to the right of sample 8 (index 7)
+    if (sampleButtons.size() >= 8)
+    {
+        auto& sample8 = sampleButtons[7];
+        auto bounds = sample8.getBounds();
+        int sliderWidth = 300;
+        int sliderHeight = 30;
+        int sliderX = bounds.getRight() + sampleSpacing;
+        int sliderY = bounds.getY() + (bounds.getHeight() - sliderHeight) / 2;
+        reverbSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+        // Position the reverb label above the reverb slider
+        reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - 20, reverbSlider.getWidth(), 20);
+    }
 }
