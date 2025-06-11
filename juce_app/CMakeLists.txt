@@ -56,3 +56,29 @@ target_compile_options(Arranger  PRIVATE -Ofast)
 
 find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
 
+find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+if (CMAKE_CXX_CPPCHECK)
+    message("-- CPPCHECK FOUND")
+    list(
+        APPEND CMAKE_CXX_CPPCHECK 
+            "--enable=warning"
+            "--inconclusive"
+            "--suppress=missingInclude"
+            "--force" 
+            "--inline-suppr"
+            "--suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSupressions.txt"
+            "--error-exitcode=1"
+            "--verbose"  # Optional: adds more detailed output
+    )
+    add_custom_target(
+        cppcheck
+        COMMAND ${CMAKE_CXX_CPPCHECK}
+            ${CMAKE_SOURCE_DIR}/PluginEditor.cpp
+            ${CMAKE_SOURCE_DIR}/PluginProcessor.cpp
+            ${CMAKE_SOURCE_DIR}/${HANDLER_FILES}
+    )
+
+endif()
+
+add_dependencies(Arranger cppcheck)
+
