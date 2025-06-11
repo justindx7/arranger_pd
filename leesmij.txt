@@ -1,1 +1,0 @@
-als je wilt werken met de mobuplat gui open dan de pdwrapper ook in plugdata

@@ -1,2 +1,0 @@
-120 drumloop1 drumloop2 3 4;
-110 drumloop3 drumloop4 2 3;
