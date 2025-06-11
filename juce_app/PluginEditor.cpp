@@ -49,7 +49,7 @@ void AudioPluginAudioProcessorEditor::resized()
     gainSlider.setBounds(getWidth()/4, getHeight()/2, getWidth() - sliderLeft - 120, 120);
 
     sample1.setBounds (50, 40, 100, 30);
-    sample2.setBounds (50, JUCE_LIVE_CONSTANT(80), 100, 30);
+    sample2.setBounds (50, 80, 100, 30);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }
