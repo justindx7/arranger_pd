@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "juce_gui_basics/juce_gui_basics.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
@@ -21,14 +22,26 @@ private:
     AudioPluginAudioProcessor& processorRef;
     juce::AudioProcessorValueTreeState& Reference;
 
+    //===============================================================================
+    //buttons
+    
+    std::vector<juce::TextButton> sampleButtons { 8 };
+    std::vector<juce::TextButton> fillsButtons { 4 };
+    std::vector<juce::TextButton> verseButtons { 4 };
 
-    juce::Slider gainSlider;
-    juce::Label gainSliderLabel;
-    std::unique_ptr<SliderAttachment> gainAttachment;
+    TextButton introButton { "Intro" };
+    TextButton outroButton { "Outro" };
 
-    juce::TextButton sample1 {"sample1.wav"};
-    juce::TextButton sample2{"sample2.wav"};
+    TextButton editButton { "Edit" };
+    TextButton stopButton { "Stop" };
 
+    //==============================================================================
+    // sliders
+
+    juce::Slider tempoSlider;
+    juce::Slider reverbSlider;
+
+    juce::Label tempoLabel { "Tempo", "Tempo" };
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)

@@ -37,7 +37,7 @@ void AudioFileHandler::loadSample() {
                 transportSource.setSource(readerSource.get(), 0, nullptr,
                                           readerSource->getAudioFormatReader()->sampleRate);
 
-                resamplingSource->setResamplingRatio(0.5);
+                resamplingSource->setResamplingRatio(1.0);
                 loaded = true;
             }
         }
