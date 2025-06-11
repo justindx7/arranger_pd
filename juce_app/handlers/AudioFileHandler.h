@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-class AudioFileHandler {
+class AudioFileHandler : public juce::ChangeListener{
 public:
     AudioFileHandler();
 
@@ -11,8 +11,13 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo &AudioSource);
     void loadSample();
     void playSample();
+    double getSampleLengthInSec();
+
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
 private:
+    void onSampleFinished();
+
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
@@ -20,4 +25,6 @@ private:
     std::unique_ptr<juce::AudioFormatReaderSource> fileSource;
     juce::String fileName;
     bool loaded = false;
+    bool transportJustStopped = false;
+    bool needsLoading = false;
 };

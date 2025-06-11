@@ -2,6 +2,7 @@
 
 AudioFileHandler::AudioFileHandler() {
     formatManager.registerBasicFormats();
+    transportSource.addChangeListener(this);
 }
 
 void AudioFileHandler::prepareToPlay(double sampleRate, int bufferSize) {
@@ -16,11 +17,38 @@ void AudioFileHandler::releaseSources() {
     transportSource.releaseResources();
 }
 
+
+double AudioFileHandler::getSampleLengthInSec() {
+    return transportSource.getLengthInSeconds() / resamplingSource->getResamplingRatio();
+}
+
 void AudioFileHandler::getNextAudioBlock(const juce::AudioSourceChannelInfo &AudioSource) {
     resamplingSource->getNextAudioBlock(AudioSource);
 }
 
+void AudioFileHandler::onSampleFinished() {
+  DBG("Sample Finised");
+
+  if (needsLoading) {
+    DBG("Needs Loading");
+    // Todo implement loading logic
+  }
+}
+
+void AudioFileHandler::changeListenerCallback(juce::ChangeBroadcaster *source) {
+  if (source == &transportSource) {
+    if (!transportSource.isPlaying() && transportJustStopped) {
+      onSampleFinished();
+      transportJustStopped = false;
+    } else if (transportSource.isPlaying()) {
+      transportJustStopped = true;
+    }
+  }
+}
+
 void AudioFileHandler::loadSample() {
+    needsLoading = true;
+
     if (!transportSource.isPlaying()) {
         loaded = false;
         transportSource.stop();
@@ -39,6 +67,7 @@ void AudioFileHandler::loadSample() {
 
                 resamplingSource->setResamplingRatio(1.0);
                 loaded = true;
+                needsLoading = false;
             }
         }
     }
