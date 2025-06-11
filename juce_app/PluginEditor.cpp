@@ -64,12 +64,24 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         tempoLabel.setText(juce::String(tempo, 1) + " BPM", juce::dontSendNotification);
     };
 
+
     // Slider for Reverb
     addAndMakeVisible(reverbSlider);
     reverbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     reverbSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, false, 0, 0);
     reverbSlider.setRange(0.0, 100.0, 0.1);
+    reverbSlider.setValue(0.0); // Default value at 50%
 
+    // Add reverb slider label
+    addAndMakeVisible(reverbLabel);
+    reverbLabel.setText("Reverb", juce::dontSendNotification);
+    reverbLabel.setJustificationType(juce::Justification::centred);
+
+    // update the label when slider value changes
+    reverbSlider.onValueChange = [this] {
+        double reverbValue = reverbSlider.getValue();
+        reverbLabel.setText(juce::String(reverbValue, 1), juce::dontSendNotification);
+    };
     
     
     //set the size of the app

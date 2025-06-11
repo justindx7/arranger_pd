@@ -42,6 +42,7 @@ private:
     juce::Slider reverbSlider;
 
     juce::Label tempoLabel { "Tempo", "Tempo" };
+    juce::Label reverbLabel { "Reverb", "Reverb" };
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
