@@ -2,6 +2,7 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "handlers/AudioFileHandler.h"
+#include "handlers/MidiHandler.h"
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor
@@ -47,6 +48,9 @@ public:
 
 private:
     //==============================================================================
+    
+    MidiHandler midiHandler;
+    
     juce::AudioProcessorValueTreeState parameters;
 
     static constexpr int numParameters = 1;
