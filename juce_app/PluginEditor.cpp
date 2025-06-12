@@ -86,7 +86,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     
     //set the size of the app
     setSize (1412 , 1000); 
-    //setResizable(true, true);
+    setResizable(true, true);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
