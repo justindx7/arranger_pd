@@ -2,7 +2,7 @@
 
 #include "handlers/AudioFileHandler.h"
 #include "handlers/MidiHandler.h"
-#include "juce_audio_processors/juce_audio_processors.h"
+#include "arranger/ArrangerLogic.h"
 #include <JuceHeader.h>
 
 //==============================================================================
@@ -46,10 +46,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     AudioFileHandler testPlayer;
+    AudioFileHandler testPlayer2;
     juce::AudioProcessorValueTreeState &getAPVTS() { return parameters; }
+
+    ArrangerLogic arrangerLogic;
 
   private:
     //==============================================================================
+    juce::MixerAudioSource mixer;
+
     
     MidiHandler midiHandler;
     

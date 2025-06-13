@@ -9,10 +9,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 
-    juce::String sample1Path = processorRef.getAPVTS().state.getProperty("sample1Path").toString();
-    sample1.setFile(sample1Path);
-    p.testPlayer.setSample(sample1Path);
-    p.testPlayer.loadSample();
     
 
     addAndMakeVisible(gainSlider);
@@ -24,6 +20,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     gainSliderLabel.setText("Gain", juce::dontSendNotification);
     gainSliderLabel.attachToComponent(&gainSlider, true);
 
+
+
+    juce::String sample1Path = processorRef.getAPVTS().state.getProperty("sample1Path").toString();
+    sample1.setFile(sample1Path);
+    p.testPlayer.setSample(sample1Path);
+    p.testPlayer.loadSample();
 
     addAndMakeVisible(sample1);
 
@@ -45,14 +47,43 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 
     addAndMakeVisible(sample2);
-    sample2.onClick = [&](){p.testPlayer.playSample();};
+    sample2.setFileSelectedCallback([&](juce::String filePath) {
+            p.testPlayer2.setSample(filePath);
+            p.testPlayer2.loadSample();
+    });
 
-    addAndMakeVisible(editModeButton);
-    editModeButton.onClick = [&]() {
-            sample1.setEditMode(editModeButton.getToggleState());
+    sample2.onNormalClick = [&]() {
+        p.testPlayer2.playSample(); 
+        sample2.setPlayingState(true);
     };
 
-    setSize (400, 300);
+    p.testPlayer2.onSampleStopped = [this]() {
+        sample2.setPlayingState(false);
+    };
+
+
+    addAndMakeVisible(editModeButton);
+
+    editModeButton.onClick = [&]() {
+            sample1.setEditMode(editModeButton.getToggleState());
+            sample2.setEditMode(editModeButton.getToggleState());
+            introButton.setEditMode(editModeButton.getToggleState());
+            for(auto &verseButton : verseButtons) {
+                verseButton.setEditMode(editModeButton.getToggleState());
+            }
+            for(auto &fillInButton : fillInButtons) {
+                fillInButton.setEditMode(editModeButton.getToggleState());
+            }
+            outroButton.setEditMode(editModeButton.getToggleState());
+    };
+
+    // Add arranger buttons to the editor
+    addAndMakeVisible(introButton);
+    for (auto& btn : verseButtons) addAndMakeVisible(btn);
+    for (auto& btn : fillInButtons) addAndMakeVisible(btn);
+    addAndMakeVisible(outroButton);
+    p.arrangerLogic.initSections(introButton, verseButtons, fillInButtons, outroButton);
+    setSize (700, 500);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -78,6 +109,23 @@ void AudioPluginAudioProcessorEditor::resized()
     sample1.setBounds (50, 40, 100, 30);
     sample2.setBounds (50, 80, 100, 30);
     editModeButton.setBounds (50, 120, 100, 30);
+
+    // Arrange arranger buttons
+    int x = 200, y = 40, w = 100, h = 30, gap = 10;
+    introButton.setBounds(x, y, w, h);
+
+    y += h + gap;
+    for (auto& btn : verseButtons) {
+        btn.setBounds(x, y, w, h);
+        y += h + gap;
+    }
+
+    for (auto& btn : fillInButtons) {
+        btn.setBounds(x + w + gap, y - (4 * (h + gap)), w, h); // Place fill-ins to the right
+        y += h + gap;
+    }
+
+    outroButton.setBounds(x, y, w, h);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }
