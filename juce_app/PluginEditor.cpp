@@ -18,7 +18,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     }
 
 
-
     int fillNumber = 1;
     for (auto &button : fillsButtons) {
         addAndMakeVisible(button);
