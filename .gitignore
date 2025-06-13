@@ -6,3 +6,4 @@
 juce_app/.vscode/launch.json
 .gitignore
 juce_app/.vscode/tasks.json
+/juce_app/.idea
