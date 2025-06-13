@@ -96,7 +96,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Set the editor to be resizable
     setResizable(true, true);
     // Enforce 16:9 aspect ratio constraint
-    getConstrainer()->setFixedAspectRatio(16.0 / 9.0);
+    // Dynamically set the aspect ratio based on the screen's aspect ratio
+    double screenAspectRatio = static_cast<double>(screenBounds.getWidth()) / static_cast<double>(screenBounds.getHeight());
+    getConstrainer()->setFixedAspectRatio(screenAspectRatio);
     
 }
 
