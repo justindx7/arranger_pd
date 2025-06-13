@@ -229,10 +229,13 @@ void AudioPluginAudioProcessorEditor::resized()
     const int bottomNumCols = 4;
     const int bottomNumRows = 2;
 
-    int bottomMargin = juce::roundToInt(getWidth() * 0.01f); // 1% of width
+    int bottomMargin = juce::roundToInt(getWidth() * 0.005f); // 1% of width
     int bottomTotalMarginWidth = (bottomNumCols + 1) * bottomMargin;
-    int bottomTotalMarginHeight = (bottomNumRows + 1) * bottomMargin;
+    // Add extra margin at the bottom for better spacing
+    int extraBottomMargin = bottomMargin * 5;
+    int bottomTotalMarginHeight = (bottomNumRows + 1) * bottomMargin + extraBottomMargin;
 
+    // Calculate the maximum square size that fits in the available area
     int bottomAvailableWidth = bottomArea.getWidth() - bottomTotalMarginWidth;
     int bottomAvailableHeight = bottomArea.getHeight() - bottomTotalMarginHeight;
 
