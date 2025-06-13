@@ -1,6 +1,8 @@
 #include "SampleButton.h"
 #include "juce_core/system/juce_PlatformDefs.h"
 
+// TODO add playing state to this button
+
 SampleButton::SampleButton(const juce::String& buttonText)
     : juce::TextButton(buttonText)
 {
@@ -86,3 +88,21 @@ void SampleButton::setFileSelectedCallback(std::function<void(juce::String)> cal
 juce::String SampleButton::getSelectedFilePath() const {
   return selectedFilePath;
 }
+
+void SampleButton::setPlayingState(bool playing) {
+  if (isPlaying != playing) {
+    isPlaying = playing;
+    repaint();
+  }
+
+  if(isPlaying) {
+    DBG("SampleButton PLAY");
+  } else {
+    DBG("SampleButton STOPPED");
+  }
+}
+
+bool SampleButton::getPlayingState() const {
+    return isPlaying;
+}
+

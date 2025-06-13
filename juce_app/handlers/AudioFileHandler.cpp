@@ -29,6 +29,10 @@ void AudioFileHandler::getNextAudioBlock(const juce::AudioSourceChannelInfo &Aud
 void AudioFileHandler::onSampleFinished() {
   DBG("Sample Finised");
 
+  if(onSampleStopped){
+      onSampleStopped();
+  }
+
   if (needsLoading) {
     DBG("Needs Loading");
     // Todo implement loading logic

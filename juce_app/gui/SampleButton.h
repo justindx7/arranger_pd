@@ -18,6 +18,9 @@ public:
     void setFileSelectedCallback(std::function<void(juce::String)> callback);
     juce::String getSelectedFilePath() const;
 
+    void setPlayingState(bool playing);
+    bool getPlayingState() const;
+
     std::function<void()> onEditModeClick;
     std::function<void()> onNormalClick;
 
@@ -25,9 +28,11 @@ private:
     juce::String audioFileWildcard = "*.wav;*.mp3;*.aiff;*.flac;*.ogg";
     std::unique_ptr<juce::FileChooser> fileChooser;
     bool editMode = false;
+    bool isPlaying = false;
 
     juce::String selectedFilePath;
     std::function<void(juce::String)> onFileSelected;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleButton )
 };

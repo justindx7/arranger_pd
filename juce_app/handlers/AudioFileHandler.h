@@ -15,6 +15,8 @@ public:
     void setSample(const juce::String &fileLocation);
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
+    std::function<void()> onSampleStopped;
+
 private:
     void onSampleFinished();
 
@@ -26,5 +28,7 @@ private:
     juce::String fileName;
     bool loaded = false;
     bool transportJustStopped = false;
+    // TODO fix needsLoading to work after sample is done playing check if setSample is the same as file currently loaded?
     bool needsLoading = false;
+    // TODO make an arranger helper that has all the buttons that it needs as one object that than can be loaded as a full component
 };
