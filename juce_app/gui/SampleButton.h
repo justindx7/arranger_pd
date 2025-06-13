@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 
-class SampleButton : public juce::TextButton {
+class SampleButton : public juce::TextButton, private juce::Timer {
 public:
     SampleButton(const juce::String& buttonText);
     ~SampleButton () override;
@@ -24,11 +24,19 @@ public:
     std::function<void()> onEditModeClick;
     std::function<void()> onNormalClick;
 
+protected:
+    void paintButton(juce::Graphics&, bool isMouseOverButton, bool isButtonDown) override;
+
 private:
     juce::String audioFileWildcard = "*.wav;*.mp3;*.aiff;*.flac;*.ogg";
     std::unique_ptr<juce::FileChooser> fileChooser;
     bool editMode = false;
     bool isPlaying = false;
+
+    bool flashOn = false;
+    void timerCallback() override;
+    void startFlashing();
+    void stopFlashing();
 
     juce::String selectedFilePath;
     std::function<void(juce::String)> onFileSelected;

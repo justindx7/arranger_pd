@@ -90,15 +90,15 @@ juce::String SampleButton::getSelectedFilePath() const {
 }
 
 void SampleButton::setPlayingState(bool playing) {
-  if (isPlaying != playing) {
+  if (isPlaying != playing && selectedFilePath != "") {
     isPlaying = playing;
-    repaint();
-  }
 
-  if(isPlaying) {
-    DBG("SampleButton PLAY");
-  } else {
-    DBG("SampleButton STOPPED");
+    if (isPlaying) {
+      startFlashing();
+    } else {
+      stopFlashing();
+    }
+    repaint();
   }
 }
 
@@ -106,3 +106,31 @@ bool SampleButton::getPlayingState() const {
     return isPlaying;
 }
 
+void SampleButton::timerCallback() {
+    flashOn = !flashOn;
+    repaint();
+}
+
+void SampleButton::startFlashing() {
+    flashOn = false;
+    startTimer(300); // Flash every 300ms
+}
+
+void SampleButton::stopFlashing() {
+    stopTimer();
+    flashOn = false;
+    repaint();
+}
+
+void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
+{
+    // Draw the normal button
+    juce::TextButton::paintButton(g, isMouseOverButton, isButtonDown);
+
+    // Overlay a white flash if playing and flashOn
+    if (isPlaying && flashOn && selectedFilePath != "")
+    {
+        g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.fillRect(getLocalBounds());
+    }
+}
