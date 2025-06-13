@@ -9,6 +9,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 
+    juce::String sample1Path = processorRef.getAPVTS().state.getProperty("sample1Path").toString();
+    sample1.setFile(sample1Path);
+    p.testPlayer.setSample(sample1Path);
+    p.testPlayer.loadSample();
+    
+
     addAndMakeVisible(gainSlider);
     gainAttachment = std::make_unique<SliderAttachment>(Reference, "uGain", gainSlider);
 
@@ -25,6 +31,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     sample1.setFileSelectedCallback([&](juce::String filePath) {
             p.testPlayer.setSample(filePath);
             p.testPlayer.loadSample();
+            processorRef.getAPVTS().state.setProperty("sample1Path", filePath, nullptr);
     });
 
     sample1.onNormalClick = [&]() {

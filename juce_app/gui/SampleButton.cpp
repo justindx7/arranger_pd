@@ -2,8 +2,6 @@
 #include "juce_core/system/juce_PlatformDefs.h"
 #include "juce_graphics/juce_graphics.h"
 
-// TODO add playing state to this button
-
 SampleButton::SampleButton(const juce::String& buttonText)
     : juce::TextButton(buttonText)
 {
@@ -107,6 +105,14 @@ bool SampleButton::getPlayingState() const {
     return isPlaying;
 }
 
+
+void SampleButton::setFile(const juce::String &newFile) { 
+    selectedFilePath = newFile;
+    juce::File selectedFile(newFile);
+    setButtonText(selectedFile.getFileName());
+    repaint();
+}
+
 void SampleButton::timerCallback() {
     flashOn = !flashOn;
     repaint();
@@ -136,7 +142,7 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     }
 
     if(selectedFilePath == "") {
-        this.setColour(juce::Colours::darkgrey.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
-        //g.fillRect(getLocalBounds());
+        g.setColour(juce::Colours::darkgrey.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.fillRect(getLocalBounds());
     }
 }

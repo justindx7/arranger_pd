@@ -1,8 +1,9 @@
 #pragma once
 
-#include <juce_audio_processors/juce_audio_processors.h>
 #include "handlers/AudioFileHandler.h"
 #include "handlers/MidiHandler.h"
+#include "juce_audio_processors/juce_audio_processors.h"
+#include <JuceHeader.h>
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor
@@ -45,8 +46,9 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     AudioFileHandler testPlayer;
+    juce::AudioProcessorValueTreeState &getAPVTS() { return parameters; }
 
-private:
+  private:
     //==============================================================================
     
     MidiHandler midiHandler;
@@ -68,6 +70,8 @@ private:
     juce::ParameterID gainParam{"uGain", 1};
 
     juce::ParameterID parameterIDs[numParameters] = {gainParam};
+
+      
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

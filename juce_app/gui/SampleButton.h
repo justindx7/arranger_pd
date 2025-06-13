@@ -21,6 +21,8 @@ public:
     void setPlayingState(bool playing);
     bool getPlayingState() const;
 
+    void setFile(const juce::String &newFile);
+
     std::function<void()> onEditModeClick;
     std::function<void()> onNormalClick;
 
