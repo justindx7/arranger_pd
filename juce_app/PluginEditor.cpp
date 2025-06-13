@@ -1,5 +1,4 @@
 #include "PluginProcessor.h"
-#include "juce_gui_extra/juce_gui_extra.h"
 #include "PluginEditor.h"
 
 //==============================================================================
@@ -19,11 +18,32 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     gainSliderLabel.setText("Gain", juce::dontSendNotification);
     gainSliderLabel.attachToComponent(&gainSlider, true);
 
+
     addAndMakeVisible(sample1);
-    sample1.onClick = [&](){p.testPlayer.playSample();};
+
+    // callback to set change current sample
+    sample1.setFileSelectedCallback([&](juce::String filePath) {
+            p.testPlayer.setSample(filePath);
+            p.testPlayer.loadSample();
+    });
+
+    sample1.onNormalClick = [&]() {
+        p.testPlayer.playSample(); 
+        sample1.setPlayingState(true);
+    };
+
+    p.testPlayer.onSampleStopped = [this]() {
+        sample1.setPlayingState(false);
+    };
+
 
     addAndMakeVisible(sample2);
     sample2.onClick = [&](){p.testPlayer.playSample();};
+
+    addAndMakeVisible(editModeButton);
+    editModeButton.onClick = [&]() {
+            sample1.setEditMode(editModeButton.getToggleState());
+    };
 
     setSize (400, 300);
 }
@@ -50,6 +70,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
     sample1.setBounds (50, 40, 100, 30);
     sample2.setBounds (50, 80, 100, 30);
+    editModeButton.setBounds (50, 120, 100, 30);
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }

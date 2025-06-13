@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "gui/SampleButton.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
@@ -26,8 +27,10 @@ private:
     juce::Label gainSliderLabel;
     std::unique_ptr<SliderAttachment> gainAttachment;
 
-    juce::TextButton sample1 {"sample1.wav"};
+    SampleButton sample1 {"sample1.wav"};
     juce::TextButton sample2{"sample2.wav"};
+
+    juce::ToggleButton editModeButton;
 
 
 
