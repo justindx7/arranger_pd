@@ -221,7 +221,7 @@ void AudioPluginAudioProcessorEditor::resized()
     
     // =========== Fills and Verses Layout with FlexBox ===========
     // Define area for fills and verses at the bottom 40% of the editor
-    int bottomAreaHeight = getHeight() * 0.54f;
+    int bottomAreaHeight = getHeight() * 0.52f;
     auto bottomArea = getLocalBounds().removeFromBottom(bottomAreaHeight);
 
     // Calculate margins and button size for 4x2 grid (fills on top row, verses on bottom row)
@@ -293,19 +293,19 @@ void AudioPluginAudioProcessorEditor::resized()
     int verseY0 = verseButtons.size() > 0 ? verseButtons[0].getBounds().getY() : (fillsY0 + bottomButtonHeight + bottomMargin);
     int verseButtonSize = bottomButtonWidth;
 
-    // Intro and Outro buttons
-    const int introOutroButtonWidth = 180;
-    const int introOutroButtonHeight = bottomButtonHeight;
 
-    // Intro button to the left of the first fill button
-    int introX = fillsX0 - introOutroButtonWidth - fillSpacing;
+
+    // Intro and Outro buttons - scale with fill buttons, stay squared, and keep same spacing
+    int introOutroButtonSize = bottomButtonWidth; // Keep square, same as fill button
+    int introX = fillsX0 - introOutroButtonSize - fillSpacing;
     int introY = fillsY0;
-    introButton.setBounds(introX, introY, introOutroButtonWidth, introOutroButtonHeight);
+    introButton.setBounds(introX, introY, introOutroButtonSize, introOutroButtonSize);
 
-    // Outro button to the right of the last fill button
-    int outroX = fillsX0 + numFills * (fillsButtonSize + fillSpacing);
+    int outroX = (fillsButtons.size() > 0)
+        ? fillsButtons[numFills - 1].getBounds().getRight() + bottomMargin
+        : fillsX0 + numFills * (fillsButtonSize + fillSpacing);
     int outroY = fillsY0;
-    outroButton.setBounds(outroX, outroY, introOutroButtonWidth, introOutroButtonHeight);
+    outroButton.setBounds(outroX, outroY, introOutroButtonSize, introOutroButtonSize);
 
     // // Edit and Stop buttons
     // // Edit button below the intro button
