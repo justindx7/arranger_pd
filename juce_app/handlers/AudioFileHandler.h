@@ -25,7 +25,10 @@ private:
     juce::AudioTransportSource transportSource;
     std::unique_ptr<juce::ResamplingAudioSource> resamplingSource;
     std::unique_ptr<juce::AudioFormatReaderSource> fileSource;
+
     juce::String fileName;
+    juce::String currentlyLoadedFile;
+
     bool loaded = false;
     bool transportJustStopped = false;
     // TODO fix needsLoading to work after sample is done playing check if setSample is the same as file currently loaded?

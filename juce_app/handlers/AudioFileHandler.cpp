@@ -34,8 +34,7 @@ void AudioFileHandler::onSampleFinished() {
   }
 
   if (needsLoading) {
-    DBG("Needs Loading");
-    // Todo implement loading logic
+      loadSample();
   }
 }
 
@@ -53,10 +52,12 @@ void AudioFileHandler::changeListenerCallback(juce::ChangeBroadcaster *source) {
 
 void AudioFileHandler::setSample(const juce::String &fileLocation) {
     fileName = fileLocation;
+    if(fileName != currentlyLoadedFile) {
+        needsLoading = true;
+    }
 }
 
 void AudioFileHandler::loadSample() {
-    needsLoading = true;
 
     if (!transportSource.isPlaying()) {
         loaded = false;
@@ -79,6 +80,7 @@ void AudioFileHandler::loadSample() {
                 resamplingSource->setResamplingRatio(1.0);
                 loaded = true;
                 needsLoading = false;
+                currentlyLoadedFile = fileName;
             }
         }
     }
