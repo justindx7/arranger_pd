@@ -283,36 +283,44 @@ void AudioPluginAudioProcessorEditor::resized()
     fillsFlexBox.performLayout(fillsRowArea);
     versesFlexBox.performLayout(versesRowArea);
 
+    // =========== End Fills and Verses Layout ===========
+
+
+    // =========== Intro, Outro, Edit, and Stop Buttons Layout ===========
+
     // Calculate positions for intro, outro, edit, and stop buttons
     // Get the bounds of the first and last fill buttons
     int fillsX0 = fillsButtons.size() > 0 ? fillsButtons[0].getBounds().getX() : bottomArea.getX();
     int fillsY0 = fillsButtons.size() > 0 ? fillsButtons[0].getBounds().getY() : bottomArea.getY();
     int fillsButtonSize = bottomButtonWidth;
 
-    // Get the bounds of the first verse button
-    int verseY0 = verseButtons.size() > 0 ? verseButtons[0].getBounds().getY() : (fillsY0 + bottomButtonHeight + bottomMargin);
-    int verseButtonSize = bottomButtonWidth;
-
-
-
     // Intro and Outro buttons - scale with fill buttons, stay squared, and keep same spacing
     int introOutroButtonSize = bottomButtonWidth; // Keep square, same as fill button
-    int introX = fillsX0 - introOutroButtonSize - fillSpacing;
+
+    // Intro button on the left of the fills row, with same spacing as between fill buttons
+    int introX = fillsX0 - bottomMargin - introOutroButtonSize;
+    // If there are fills, position it before the first fill button
+    // If no fills, position it at the same X as the first fill button
     int introY = fillsY0;
     introButton.setBounds(introX, introY, introOutroButtonSize, introOutroButtonSize);
 
+    // Outro button on the right of the fills row, with same spacing as between fill buttons
+    // If there are fills, position it after the last fill button
     int outroX = (fillsButtons.size() > 0)
         ? fillsButtons[numFills - 1].getBounds().getRight() + bottomMargin
-        : fillsX0 + numFills * (fillsButtonSize + fillSpacing);
+        // If no fills, position it at the same X as intro button
+        : fillsX0 + numFills * (fillsButtonSize + bottomMargin);
     int outroY = fillsY0;
     outroButton.setBounds(outroX, outroY, introOutroButtonSize, introOutroButtonSize);
 
-    // // Edit and Stop buttons
-    // // Edit button below the intro button
-    // const int editStopButtonSize = 100;
-    // int editX = introX;
-    // int editY = verseY0 + editStopButtonSize - editSpacing;
-    // editButton.setBounds(editX, editY, editStopButtonSize, editStopButtonSize);
+
+    // Edit and Stop buttons
+    // Edit button below the intro button
+    const int editStopButtonSize = 100;
+    int verseY0 = verseButtons.size() > 0 ? verseButtons[0].getBounds().getY() : bottomArea.getY();
+    int editX = introX;
+    int editY = verseY0 + editStopButtonSize - editSpacing;
+    editButton.setBounds(editX, editY, editStopButtonSize, editStopButtonSize);
 
     // // Stop button below the outro button
     // int stopX = outroX + verseButtonSize - editStopButtonSize;
