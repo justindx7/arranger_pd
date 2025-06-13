@@ -1,5 +1,6 @@
 #include "SampleButton.h"
 #include "juce_core/system/juce_PlatformDefs.h"
+#include "juce_graphics/juce_graphics.h"
 
 // TODO add playing state to this button
 
@@ -132,5 +133,10 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     {
         g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
+    }
+
+    if(selectedFilePath == "") {
+        this.setColour(juce::Colours::darkgrey.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        //g.fillRect(getLocalBounds());
     }
 }
