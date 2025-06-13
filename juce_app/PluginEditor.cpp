@@ -51,7 +51,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     tempoSlider.setRange(-10.0, +10.0, 0.1);
     tempoSlider.setValue(0.0);
     tempoSlider.setTextValueSuffix("BPM");
-
     // Set the look and feel for the tempo slider
     tempoSlider.setLookAndFeel(new sliderLookAndFeel()); // Set custom look and feel for the slider
 
@@ -76,6 +75,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     reverbSlider.setRange(0.0, 100.0, 0.1);
     reverbSlider.setValue(0.0); // Default value at 50%
     reverbSlider.setTextValueSuffix("%");
+    // Set the look and feel for the reverb slider
+    reverbSlider.setLookAndFeel(new sliderLookAndFeel()); // Set custom look and feel for the slider
 
     // Add reverb slider label
     addAndMakeVisible(reverbLabel);

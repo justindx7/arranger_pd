@@ -8,6 +8,7 @@ class sliderLookAndFeel : public juce::LookAndFeel_V4
 public:
     sliderLookAndFeel()
     {
+        // Set the colours for the slider
         setColour(juce::Slider::thumbColourId, juce::Colours::white);
         setColour(juce::Slider::trackColourId, juce::Colours::red);
 
@@ -41,7 +42,7 @@ public:
             g.fillRect(cx, (float)y, trackThickness, (float)height);
         }
 
-        const int thSize = 30; // Size of the thumb
+        const int thSize = 23; // Size of the thumb
         // Draw thumb
         g.setColour(slider.findColour(juce::Slider::thumbColourId));
         juce::Path thumb;
