@@ -173,12 +173,16 @@ void AudioPluginAudioProcessorEditor::resized()
     // Place the tempo slider next to sample 4 (index 3), scaling proportionally with sample button size
     if (sampleButtons.size() >= 4)
     {
+        // Get the bounds of sample button 4 (index 3)
         auto& sample4 = sampleButtons[3];
+        // Get the bounds of the sample button to position the tempo slider
         auto bounds = sample4.getBounds();
+
 
         // Slider width and height proportional to sample button size
         int sliderWidth = buttonWidth * 2;
         int sliderHeight = buttonHeight * 0.25;
+
         int sliderX = bounds.getRight() + margin;
         int sliderY = bounds.getY() + (bounds.getHeight() - sliderHeight) / 2;
         tempoSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
@@ -192,6 +196,7 @@ void AudioPluginAudioProcessorEditor::resized()
     // Place the reverb slider to the right of sample 8 (index 7), scaling proportionally
     if (sampleButtons.size() >= 8)
     {
+        // Get the bounds of sample button 8 (index 7)
         auto& sample8 = sampleButtons[7];
         auto bounds = sample8.getBounds();
 
