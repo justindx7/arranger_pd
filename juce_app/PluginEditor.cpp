@@ -306,17 +306,21 @@ void AudioPluginAudioProcessorEditor::resized()
     // Intro and Outro buttons - scale with fill buttons, stay squared, and keep same spacing
     int introOutroButtonSize = bottomButtonWidth; // Keep square, same as fill button
 
+
+    // Intro button
     // Intro button on the left of the fills row, with same spacing as between fill buttons
-    int introX = fillsX0 - bottomMargin - introOutroButtonSize;
+    int introX = fillsX0 - bottomMargin - extraBottomMargin - introOutroButtonSize;
     // If there are fills, position it before the first fill button
     // If no fills, position it at the same X as the first fill button
     int introY = fillsY0;
     introButton.setBounds(introX, introY, introOutroButtonSize, introOutroButtonSize);
 
+
+    // Outro button
     // Outro button on the right of the fills row, with same spacing as between fill buttons
     // If there are fills, position it after the last fill button
     int outroX = (fillsButtons.size() > 0)
-        ? fillsButtons[numFills - 1].getBounds().getRight() + bottomMargin
+        ? fillsButtons[numFills - 1].getBounds().getRight() + bottomMargin + extraBottomMargin
         // If no fills, position it at the same X as intro button
         : fillsX0 + numFills * (fillsButtonSize + bottomMargin);
     int outroY = fillsY0;
@@ -335,7 +339,6 @@ void AudioPluginAudioProcessorEditor::resized()
 
     // Stop button
     // Align stop button X with outro button, Y with verse row
-
     int stopX = outroButton.getX() + editStopButtonSize;
     int stopY = versesRowArea.getY() + editStopButtonSize;
     stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
