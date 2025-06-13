@@ -17,7 +17,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         button.setButtonText("Sample " + juce::String(sampleNumber++));
     }
 
-
     int fillNumber = 1;
     for (auto &button : fillsButtons) {
         addAndMakeVisible(button);
@@ -29,12 +28,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         addAndMakeVisible(button);
         button.setButtonText("Verse " + juce::String(verseNumber++));
     }
-    // sample1.onClick = [&](){p.testPlayer.playSample();};
 
-    // Add the intro and outro buttons
+    // Add the intro button
     addAndMakeVisible(introButton);
     introButton.setButtonText("Intro");
 
+    // Add the outro button
     addAndMakeVisible(outroButton);
     outroButton.setButtonText("Outro");
 
@@ -48,11 +47,13 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Add the tempo slider with a range of -10% to +10%, starting at 0%
     addAndMakeVisible(tempoSlider);
     tempoSlider.setSliderStyle(juce::Slider::LinearHorizontal);
-    // tempoSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, false, 80, 20);
     tempoSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 0, 0);
     tempoSlider.setRange(-10.0, +10.0, 0.1);
     tempoSlider.setValue(0.0);
     tempoSlider.setTextValueSuffix("BPM");
+
+    tempoSlider.setLookAndFeel(new sliderLookAndFeel()); // Set custom look and feel for the slider
+
 
     // Add tempo slider label
     addAndMakeVisible(tempoLabel);
@@ -115,6 +116,10 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);
     g.drawFittedText ("Arranger", getLocalBounds(), juce::Justification::topLeft, 1);
+
+    //color for easy debugging
+    // g.fillRect(tempoSlider.getBounds().toFloat().reduced(2.0f));
+
 }
 
 void AudioPluginAudioProcessorEditor::resized()
@@ -173,7 +178,11 @@ void AudioPluginAudioProcessorEditor::resized()
         rowFlexBox.performLayout(rowBounds);
     }
 
+
     // Tempo slider
+
+    // Set the size of the tempo slider to match the sample button width and 1/4 of its height);
+
     // Place the tempo slider next to sample 4 (index 3), scaling proportionally with sample button size
     if (sampleButtons.size() >= 4)
     {

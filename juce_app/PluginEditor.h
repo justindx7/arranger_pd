@@ -3,6 +3,37 @@
 #include "PluginProcessor.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
+class sliderLookAndFeel : public juce::LookAndFeel_V4
+{   
+public:
+    sliderLookAndFeel()
+    {
+        setColour(juce::Slider::thumbColourId, juce::Colours::white);
+        setColour(juce::Slider::trackColourId, juce::Colours::lightgrey);
+        setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::lightgrey);
+    }
+
+    void setTrackThickness(float thickness)
+    {
+        trackThickness = thickness;
+    }
+
+    void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height,
+                           float sliderPos, float minSliderPos, float maxSliderPos,
+                           const juce::Slider::SliderStyle style, juce::Slider& slider) override
+    {
+        juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
+
+        // You can further customize drawing here if needed, using trackThickness
+    }
+
+private:
+    float trackThickness = 40.0f;
+
+    ~sliderLookAndFeel() override {}
+};
+
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
