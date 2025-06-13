@@ -215,11 +215,10 @@ void AudioPluginAudioProcessorEditor::resized()
         reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - labelHeight - margin / 2, reverbSlider.getWidth(), labelHeight);
     }
 
-
-
-
-    
+    // =========== End Sample Buttons Layout ===========
+        
     // =========== Fills and Verses Layout with FlexBox ===========
+
     // Define area for fills and verses at the bottom 40% of the editor
     int bottomAreaHeight = getHeight() * 0.52f;
     auto bottomArea = getLocalBounds().removeFromBottom(bottomAreaHeight);
@@ -315,12 +314,16 @@ void AudioPluginAudioProcessorEditor::resized()
 
 
     // Edit and Stop buttons
-    // Edit button below the intro button
-    const int editStopButtonSize = 100;
-    int verseY0 = verseButtons.size() > 0 ? verseButtons[0].getBounds().getY() : bottomArea.getY();
-    int editX = introX;
-    int editY = verseY0 + editStopButtonSize - editSpacing;
+    // Place the edit button at the bottom left, aligned with the verse row
+    const int editStopButtonSize = bottomButtonWidth / 2;
+    // int editX = bottomArea.getX() + bottomMargin + verseSpacing;
+    // int editY = versesRowArea.getY() + (versesRowArea.getHeight() - editStopButtonSize) / 2 + verseSpacing;
+
+    // Align edit button X with intro button, Y with verse row
+    int editX = introButton.getX() ;
+    int editY = versesRowArea.getY() + editStopButtonSize;
     editButton.setBounds(editX, editY, editStopButtonSize, editStopButtonSize);
+
 
     // // Stop button below the outro button
     // int stopX = outroX + verseButtonSize - editStopButtonSize;
