@@ -249,10 +249,13 @@ void AudioPluginAudioProcessorEditor::resized()
     fillsFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
     fillsFlexBox.alignItems = juce::FlexBox::AlignItems::center;
 
+    // Create buttons for fills
+    // Ensure we only add as many buttons as available
     for (int i = 0; i < numFills && i < fillsButtons.size(); ++i)
     {
         fillsFlexBox.items.add(
             juce::FlexItem(fillsButtons[i])
+                // Set the width and height of each fill button
                 .withWidth(bottomButtonWidth)
                 .withHeight(bottomButtonHeight)
                 .withMargin(bottomMargin)
@@ -265,10 +268,13 @@ void AudioPluginAudioProcessorEditor::resized()
     versesFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
     versesFlexBox.alignItems = juce::FlexBox::AlignItems::center;
 
+    // Create buttons for verses
+    // Ensure we only add as many buttons as available
     for (int i = 0; i < numVerses && i < verseButtons.size(); ++i)
     {
         versesFlexBox.items.add(
             juce::FlexItem(verseButtons[i])
+                // Set the width and height of each verse button
                 .withWidth(bottomButtonWidth)
                 .withHeight(bottomButtonHeight)
                 .withMargin(bottomMargin)
@@ -279,6 +285,7 @@ void AudioPluginAudioProcessorEditor::resized()
     auto fillsRowArea = bottomArea.removeFromTop(static_cast<int>(bottomButtonHeight + 2 * margin));
     auto versesRowArea = bottomArea.removeFromTop(static_cast<int>(bottomButtonHeight + 2 * margin));
 
+    // Perform layout for fills and verses using FlexBox
     fillsFlexBox.performLayout(fillsRowArea);
     versesFlexBox.performLayout(versesRowArea);
 
@@ -314,19 +321,23 @@ void AudioPluginAudioProcessorEditor::resized()
 
 
     // Edit and Stop buttons
-    // Place the edit button at the bottom left, aligned with the verse row
-    const int editStopButtonSize = bottomButtonWidth / 2;
-    // int editX = bottomArea.getX() + bottomMargin + verseSpacing;
-    // int editY = versesRowArea.getY() + (versesRowArea.getHeight() - editStopButtonSize) / 2 + verseSpacing;
 
+    // Edit button 
+    // Calculate the size of the edit and stop buttons based on the bottom button width
+    const int editStopButtonSize = bottomButtonWidth / 2;
     // Align edit button X with intro button, Y with verse row
     int editX = introButton.getX() ;
     int editY = versesRowArea.getY() + editStopButtonSize;
     editButton.setBounds(editX, editY, editStopButtonSize, editStopButtonSize);
 
+    // Stop button
+    // Align stop button X with outro button, Y with verse row
 
-    // // Stop button below the outro button
-    // int stopX = outroX + verseButtonSize - editStopButtonSize;
+    int stopX = outroButton.getX() + editStopButtonSize;
+    int stopY = versesRowArea.getY() + editStopButtonSize;
+    stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
+
+    // int stopX = outroButton.getX() + verseButtonSize - editStopButtonSize;
     // int stopY = verseY0 + editStopButtonSize - editSpacing;
     // stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
 }
