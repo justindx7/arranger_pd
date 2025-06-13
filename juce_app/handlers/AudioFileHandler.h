@@ -17,6 +17,8 @@ public:
 
     std::function<void()> onSampleStopped;
 
+     juce::ResamplingAudioSource* getSource() {return resamplingSource.get();}
+
 private:
     void onSampleFinished();
 

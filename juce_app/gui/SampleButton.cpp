@@ -1,6 +1,4 @@
 #include "SampleButton.h"
-#include "juce_core/system/juce_PlatformDefs.h"
-#include "juce_graphics/juce_graphics.h"
 
 SampleButton::SampleButton(const juce::String& buttonText)
     : juce::TextButton(buttonText)

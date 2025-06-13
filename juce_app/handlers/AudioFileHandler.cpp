@@ -13,7 +13,9 @@ void AudioFileHandler::prepareToPlay(double sampleRate, int bufferSize) {
 }
 
 void AudioFileHandler::releaseSources() {
-    resamplingSource->releaseResources();
+    if(resamplingSource)
+        resamplingSource->releaseResources();
+
     transportSource.releaseResources();
 }
 
@@ -23,7 +25,12 @@ double AudioFileHandler::getSampleLengthInSec() {
 }
 
 void AudioFileHandler::getNextAudioBlock(const juce::AudioSourceChannelInfo &AudioSource) {
-    resamplingSource->getNextAudioBlock(AudioSource);
+    if(resamplingSource) {
+        resamplingSource->getNextAudioBlock(AudioSource);
+    }
+    else {
+        AudioSource.clearActiveBufferRegion();
+    }
 }
 
 void AudioFileHandler::onSampleFinished() {
@@ -76,8 +83,9 @@ void AudioFileHandler::loadSample() {
                 readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader.release(), true);
                 transportSource.setSource(readerSource.get(), 0, nullptr,
                                           readerSource->getAudioFormatReader()->sampleRate);
+                if(resamplingSource)
+                    resamplingSource->setResamplingRatio(playBackSpeed);
 
-                resamplingSource->setResamplingRatio(playBackSpeed);
                 loaded = true;
                 needsLoading = false;
                 currentlyLoadedFile = fileName;
@@ -87,7 +95,7 @@ void AudioFileHandler::loadSample() {
 }
 
 void AudioFileHandler::playSample() {
-    if (loaded && !transportSource.isPlaying()) {
+    if (loaded && !transportSource.isPlaying() && currentlyLoadedFile !="") {
         transportSource.setPosition(0.0);
         transportSource.start();
     }
