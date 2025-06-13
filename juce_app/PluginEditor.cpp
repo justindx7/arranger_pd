@@ -87,15 +87,17 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     };
     
     
-    // Set the size of the app with a fixed aspect ratio (e.g., 16:9) and lock resizing to that ratio
-    const int width = 1412;
-    const int height = juce::roundToInt(width * 9.0 / 16.0);
+    // Set the size of the editor
+    // Set the size of the editor to 90% of the screen size
+    auto screenBounds = juce::Desktop::getInstance().getDisplays().getMainDisplay().userArea;
+    int width = static_cast<int>(screenBounds.getWidth() * 0.9);
+    int height = static_cast<int>(screenBounds.getHeight() * 0.9);
     setSize(width, height);
-    setResizable(true, false); // Allow resizing, but only horizontally
-
-    // Enforce fixed aspect ratio (16:9)
+    // Set the editor to be resizable
+    setResizable(true, true);
+    // Enforce 16:9 aspect ratio constraint
     getConstrainer()->setFixedAspectRatio(16.0 / 9.0);
-
+    
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -133,7 +135,7 @@ void AudioPluginAudioProcessorEditor::resized()
     int totalMarginHeight = (numRows + 1) * margin;
 
     int availableWidth = getWidth() - totalMarginWidth;
-    int availableHeight = getHeight() * 0.4f - totalMarginHeight; // 20% of height for sample buttons
+    int availableHeight = getHeight() * 0.4f - totalMarginHeight; // Use 40% of the height for sample buttons
 
     int buttonSizeByWidth = availableWidth / numCols;
     int buttonSizeByHeight = availableHeight / numRows;
