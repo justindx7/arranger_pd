@@ -122,6 +122,8 @@ void AudioPluginAudioProcessorEditor::resized()
     const int verseSpacing = 30;
     const int editSpacing = 15;
 
+    // =========== Sample Buttons Layout ===========
+    // Sample buttons are arranged in a grid of 2 rows and 4 columns
     // Sample buttons in 2 rows of 4 using FlexBox, keeping square ratio
     const int numRows = 2;
     const int numCols = 4;
@@ -168,7 +170,6 @@ void AudioPluginAudioProcessorEditor::resized()
         rowFlexBox.performLayout(rowBounds);
     }
 
-    
     // Tempo slider
     // Place the tempo slider next to sample 4 (index 3), scaling proportionally with sample button size
     if (sampleButtons.size() >= 4)
@@ -210,35 +211,70 @@ void AudioPluginAudioProcessorEditor::resized()
         int labelHeight = sliderHeight * 0.8;
         reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - labelHeight - margin / 2, reverbSlider.getWidth(), labelHeight);
     }
-}
 
-    // // Fills buttons
-    // const int fillsButtonSize = 180;
-    // const int numFills = fillsButtons.size();
-    // int totalFillsWidth = numFills * fillsButtonSize + (numFills - 1) * fillSpacing;
-    // int fillsX0 = (getWidth() - totalFillsWidth) / 2;
-    // int fillsY0 = getHeight() - 2.5 * (fillsButtonSize + fillSpacing);
+    // =========== Fills and Verses Layout with FlexBox ===========
+    // Define area for fills and verses at the bottom 40% of the editor
+    int bottomAreaHeight = getHeight() * 0.4f;
+    auto bottomArea = getLocalBounds().removeFromBottom(bottomAreaHeight);
 
-    // for (int i = 0; i < numFills; ++i)
-    // {
-    //     int x = fillsX0 + i * (fillsButtonSize + fillSpacing);
-    //     int y = fillsY0;
-    //     fillsButtons[i].setBounds(x, y, fillsButtonSize, fillsButtonSize);
-    // }
+    // Calculate margins and button size for 4x2 grid (fills on top row, verses on bottom row)
+    const int numFills = 4;
+    const int numVerses = 4;
+    const int bottomNumCols = 4;
+    const int bottomNumRows = 2;
 
-    // // Verse buttons
-    // const int verseButtonSize = 180;
-    // const int numVerses = verseButtons.size();
-    // int totalVersesWidth = numVerses * verseButtonSize + (numVerses - 1) * verseSpacing;
-    // int verseX0 = (getWidth() - totalVersesWidth) / 2;
-    // int verseY0 = fillsY0 + fillsButtonSize + verseSpacing;
+    int bottomMargin = juce::roundToInt(getWidth() * 0.01f); // 1% of width
+    int bottomTotalMarginWidth = (bottomNumCols + 1) * bottomMargin;
+    int bottomTotalMarginHeight = (bottomNumRows + 1) * bottomMargin;
 
-    // for (int i = 0; i < numVerses; ++i)
-    // {
-    //     int x = verseX0 + i * (verseButtonSize + verseSpacing);
-    //     int y = verseY0;
-    //     verseButtons[i].setBounds(x, y, verseButtonSize, verseButtonSize);
-    // }
+    int bottomAvailableWidth = bottomArea.getWidth() - bottomTotalMarginWidth;
+    int bottomAvailableHeight = bottomArea.getHeight() - bottomTotalMarginHeight;
+
+    int bottomButtonSizeByWidth = bottomAvailableWidth / bottomNumCols;
+    int bottomButtonSizeByHeight = bottomAvailableHeight / bottomNumRows;
+    int bottomButtonSize = std::min(bottomButtonSizeByWidth, bottomButtonSizeByHeight);
+
+    int bottomButtonWidth = bottomButtonSize;
+    int bottomButtonHeight = bottomButtonSize;
+
+    // Fills row (top row)
+    juce::FlexBox fillsFlexBox;
+    fillsFlexBox.flexDirection = juce::FlexBox::Direction::row;
+    fillsFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    fillsFlexBox.alignItems = juce::FlexBox::AlignItems::center;
+
+    for (int i = 0; i < numFills && i < fillsButtons.size(); ++i)
+    {
+        fillsFlexBox.items.add(
+            juce::FlexItem(fillsButtons[i])
+                .withWidth(bottomButtonWidth)
+                .withHeight(bottomButtonHeight)
+                .withMargin(bottomMargin)
+        );
+    }
+
+    // Verses row (bottom row)
+    juce::FlexBox versesFlexBox;
+    versesFlexBox.flexDirection = juce::FlexBox::Direction::row;
+    versesFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
+    versesFlexBox.alignItems = juce::FlexBox::AlignItems::center;
+
+    for (int i = 0; i < numVerses && i < verseButtons.size(); ++i)
+    {
+        versesFlexBox.items.add(
+            juce::FlexItem(verseButtons[i])
+                .withWidth(bottomButtonWidth)
+                .withHeight(bottomButtonHeight)
+                .withMargin(bottomMargin)
+        );
+    }
+
+    // Split bottomArea into two rows for fills and verses
+    auto fillsRowArea = bottomArea.removeFromTop(static_cast<int>(bottomButtonHeight + 2 * margin));
+    auto versesRowArea = bottomArea.removeFromTop(static_cast<int>(bottomButtonHeight + 2 * margin));
+
+    fillsFlexBox.performLayout(fillsRowArea);
+    versesFlexBox.performLayout(versesRowArea);
 
     // // Intro and Outro buttons
     // const int introOutroButtonWidth = 180;
@@ -265,3 +301,4 @@ void AudioPluginAudioProcessorEditor::resized()
     // int stopX = outroX + verseButtonSize - editStopButtonSize;;
     // int stopY = verseY0 + editStopButtonSize - editSpacing;
     // stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
+}
