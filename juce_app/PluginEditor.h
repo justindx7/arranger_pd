@@ -59,6 +59,7 @@ public:
         g.fillPath(thumb);
     }
 
+
 private:
     float trackThickness = 10.0f; 
 
