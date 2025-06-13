@@ -52,6 +52,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     tempoSlider.setValue(0.0);
     tempoSlider.setTextValueSuffix("BPM");
 
+    // Set the look and feel for the tempo slider
     tempoSlider.setLookAndFeel(new sliderLookAndFeel()); // Set custom look and feel for the slider
 
 

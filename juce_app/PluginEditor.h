@@ -9,9 +9,10 @@ public:
     sliderLookAndFeel()
     {
         setColour(juce::Slider::thumbColourId, juce::Colours::white);
-        setColour(juce::Slider::trackColourId, juce::Colours::lightgrey);
+        setColour(juce::Slider::trackColourId, juce::Colours::red);
         setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
         setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::lightgrey);
+        trackThickness = 10.0f; // Three times the original thickness (3 * 40.0f)
     }
 
     void setTrackThickness(float thickness)
@@ -23,13 +24,34 @@ public:
                            float sliderPos, float minSliderPos, float maxSliderPos,
                            const juce::Slider::SliderStyle style, juce::Slider& slider) override
     {
-        juce::LookAndFeel_V4::drawLinearSlider(g, x, y, width, height, sliderPos, minSliderPos, maxSliderPos, style, slider);
+        // Draw the background
+        g.setColour(slider.findColour(juce::Slider::trackColourId));
 
-        // You can further customize drawing here if needed, using trackThickness
+        if (style == juce::Slider::LinearHorizontal)
+        {
+            float cy = y + height / 2.0f - trackThickness / 2.0f;
+            g.fillRect((float)x, cy, (float)width, trackThickness);
+        }
+        else if (style == juce::Slider::LinearVertical)
+        {
+            float cx = x + width / 2.0f - trackThickness / 2.0f;
+            g.fillRect(cx, (float)y, trackThickness, (float)height);
+        }
+
+        // Draw thumb
+        g.setColour(slider.findColour(juce::Slider::thumbColourId));
+        juce::Path thumb;
+        if (style == juce::Slider::LinearHorizontal)
+            thumb.addEllipse(sliderPos - 5, y + height / 2.0f - 5, 10, 10);
+        else if (style == juce::Slider::LinearVertical)
+            thumb.addEllipse(x + width / 2.0f - 5, sliderPos - 5, 10, 10);
+
+        g.fillPath(thumb);
+        
     }
 
 private:
-    float trackThickness = 40.0f;
+    float trackThickness = 10.0f; 
 
     ~sliderLookAndFeel() override {}
 };
