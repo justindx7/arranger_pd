@@ -215,9 +215,13 @@ void AudioPluginAudioProcessorEditor::resized()
         reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - labelHeight - margin / 2, reverbSlider.getWidth(), labelHeight);
     }
 
+
+
+
+    
     // =========== Fills and Verses Layout with FlexBox ===========
     // Define area for fills and verses at the bottom 40% of the editor
-    int bottomAreaHeight = getHeight() * 0.4f;
+    int bottomAreaHeight = getHeight() * 0.54f;
     auto bottomArea = getLocalBounds().removeFromBottom(bottomAreaHeight);
 
     // Calculate margins and button size for 4x2 grid (fills on top row, verses on bottom row)
@@ -279,19 +283,29 @@ void AudioPluginAudioProcessorEditor::resized()
     fillsFlexBox.performLayout(fillsRowArea);
     versesFlexBox.performLayout(versesRowArea);
 
-    // // Intro and Outro buttons
-    // const int introOutroButtonWidth = 180;
-    // const int introOutroButtonHeight = fillsButtonSize;
+    // Calculate positions for intro, outro, edit, and stop buttons
+    // Get the bounds of the first and last fill buttons
+    int fillsX0 = fillsButtons.size() > 0 ? fillsButtons[0].getBounds().getX() : bottomArea.getX();
+    int fillsY0 = fillsButtons.size() > 0 ? fillsButtons[0].getBounds().getY() : bottomArea.getY();
+    int fillsButtonSize = bottomButtonWidth;
 
-    // // Intro button to the left of the first fill button
-    // int introX = fillsX0 - introOutroButtonWidth - fillSpacing;
-    // int introY = fillsY0;
-    // introButton.setBounds(introX, introY, introOutroButtonWidth, introOutroButtonHeight);
+    // Get the bounds of the first verse button
+    int verseY0 = verseButtons.size() > 0 ? verseButtons[0].getBounds().getY() : (fillsY0 + bottomButtonHeight + bottomMargin);
+    int verseButtonSize = bottomButtonWidth;
 
-    // // Outro button to the right of the last fill button
-    // int outroX = fillsX0 + numFills * (fillsButtonSize + fillSpacing);
-    // int outroY = fillsY0;
-    // outroButton.setBounds(outroX, outroY, introOutroButtonWidth, introOutroButtonHeight);
+    // Intro and Outro buttons
+    const int introOutroButtonWidth = 180;
+    const int introOutroButtonHeight = bottomButtonHeight;
+
+    // Intro button to the left of the first fill button
+    int introX = fillsX0 - introOutroButtonWidth - fillSpacing;
+    int introY = fillsY0;
+    introButton.setBounds(introX, introY, introOutroButtonWidth, introOutroButtonHeight);
+
+    // Outro button to the right of the last fill button
+    int outroX = fillsX0 + numFills * (fillsButtonSize + fillSpacing);
+    int outroY = fillsY0;
+    outroButton.setBounds(outroX, outroY, introOutroButtonWidth, introOutroButtonHeight);
 
     // // Edit and Stop buttons
     // // Edit button below the intro button
@@ -301,7 +315,7 @@ void AudioPluginAudioProcessorEditor::resized()
     // editButton.setBounds(editX, editY, editStopButtonSize, editStopButtonSize);
 
     // // Stop button below the outro button
-    // int stopX = outroX + verseButtonSize - editStopButtonSize;;
+    // int stopX = outroX + verseButtonSize - editStopButtonSize;
     // int stopY = verseY0 + editStopButtonSize - editSpacing;
     // stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
 }
