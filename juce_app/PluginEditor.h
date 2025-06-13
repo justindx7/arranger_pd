@@ -10,6 +10,9 @@ public:
     {
         setColour(juce::Slider::thumbColourId, juce::Colours::white);
         setColour(juce::Slider::trackColourId, juce::Colours::red);
+
+        //text box setttings
+        // However this is redundant as the text box is not used in the slider 
         setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
         setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::lightgrey);
         trackThickness = 10.0f; // Three times the original thickness (3 * 40.0f)
@@ -38,16 +41,21 @@ public:
             g.fillRect(cx, (float)y, trackThickness, (float)height);
         }
 
+        const int thSize = 30; // Size of the thumb
         // Draw thumb
         g.setColour(slider.findColour(juce::Slider::thumbColourId));
         juce::Path thumb;
         if (style == juce::Slider::LinearHorizontal)
-            thumb.addEllipse(sliderPos - 5, y + height / 2.0f - 5, 10, 10);
+        {
+            float cy = y + height / 2.0f;
+            thumb.addEllipse(sliderPos - thSize / 2.0f, cy - thSize / 2.0f, thSize, thSize);
+        }
         else if (style == juce::Slider::LinearVertical)
-            thumb.addEllipse(x + width / 2.0f - 5, sliderPos - 5, 10, 10);
-
+        {
+            float cx = x + width / 2.0f;
+            thumb.addEllipse(cx - thSize / 2.0f, sliderPos - thSize / 2.0f, thSize, thSize);
+        }
         g.fillPath(thumb);
-        
     }
 
 private:
