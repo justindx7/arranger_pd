@@ -5,6 +5,9 @@
 SampleButton::SampleButton(const juce::String& buttonText)
     : juce::TextButton(buttonText)
 {
+         
+    originalButtonText = buttonText;
+    setButtonText(originalButtonText);
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
     //setColour(juce::TextButton::textColourOffId, juce::Colours::white);
@@ -36,31 +39,51 @@ bool SampleButton::isInEditMode() const {
 }
 
 void SampleButton::enterEditMode() {
+    auto* popup = new SampleEditPopup(
+        [this]() {
+            fileChooser = std::make_unique<FileChooser>(
+                "Please select the audio file you want to load...",
+                File::getSpecialLocation(File::userHomeDirectory),
+                audioFileWildcard);
 
-fileChooser = std::make_unique<FileChooser> ("Please select the audio file you want to load...",
-                                               File::getSpecialLocation (File::userHomeDirectory),
-                                               audioFileWildcard);
- 
-    auto fileChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
+            auto fileChooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
 
-    fileChooser->launchAsync(fileChooserFlags, [this](
-                                                   const FileChooser &chooser) {
-      File selectedFile(chooser.getResult());
+            fileChooser->launchAsync(fileChooserFlags, [this](const FileChooser& chooser) {
+                File selectedFile(chooser.getResult());
 
-      if (selectedFile.existsAsFile()) {
-        selectedFilePath = selectedFile.getFullPathName();
+                if (selectedFile.existsAsFile()) {
+                    selectedFilePath = selectedFile.getFullPathName();
+                    setButtonText(selectedFile.getFileName());
+                    repaint();
+                    DBG("Selected file path: " << selectedFilePath.toStdString());
 
-        setButtonText(selectedFile.getFileName());
-        repaint();
-        DBG( "Selected file path: " << selectedFilePath.toStdString());
+                    if (onFileSelected)
+                        onFileSelected(selectedFilePath);
+                } else {
+                    DBG("No file selected");
+                }
+            });
+        },
+        [this]() {
+            selectedFilePath = "";
+            setButtonText(originalButtonText);
+            repaint();
+            if (onFileSelected)
+                onFileSelected(selectedFilePath);
+        }
+    );
 
-        // Call the callback if it's set
-        if (onFileSelected)
-          onFileSelected(selectedFilePath);
-      } else {
-        DBG("No file selected");
-      }
-    });
+    juce::DialogWindow::LaunchOptions options;
+    options.content.setOwned(popup);
+    options.content->setSize(300, 180);
+    options.dialogTitle = "Sample Options";
+    options.dialogBackgroundColour = juce::Colours::darkgrey;
+    options.escapeKeyTriggersCloseButton = true;
+    options.useNativeTitleBar = false;
+    options.resizable = false;
+
+    options.launchAsync();
+
 }
 
 void SampleButton::clicked()
@@ -142,6 +165,7 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     }
 
     if(selectedFilePath == "") {
+        setButtonText(originalButtonText);
         g.setColour(juce::Colours::darkgrey.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
