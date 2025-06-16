@@ -1,11 +1,16 @@
 #include "SampleButton.h"
+#include "juce_core/system/juce_PlatformDefs.h"
 
-SampleButton::SampleButton(const juce::String& buttonText)
-    : juce::TextButton(buttonText)
+SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference)
+    : juce::TextButton(buttonText), APVTSRef(Reference)
 {
          
     originalButtonText = buttonText;
     setButtonText(originalButtonText);
+    APVTSName = makeValidXmlName(originalButtonText) + "Path";
+    juce::String apvts = APVTSRef.state.getProperty(APVTSName);
+    setFile(apvts);
+
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
     //setColour(juce::TextButton::textColourOffId, juce::Colours::white);
@@ -50,24 +55,16 @@ void SampleButton::enterEditMode() {
                 File selectedFile(chooser.getResult());
 
                 if (selectedFile.existsAsFile()) {
-                    selectedFilePath = selectedFile.getFullPathName();
-                    setButtonText(selectedFile.getFileName());
-                    repaint();
+                    setFile(selectedFile.getFullPathName());
                     DBG("Selected file path: " << selectedFilePath.toStdString());
 
-                    if (onFileSelected)
-                        onFileSelected(selectedFilePath);
                 } else {
                     DBG("No file selected");
                 }
             });
         },
         [this]() {
-            selectedFilePath = "";
-            setButtonText(originalButtonText);
-            repaint();
-            if (onFileSelected)
-                onFileSelected(selectedFilePath);
+            setFile("");
         }
     );
 
@@ -127,12 +124,30 @@ bool SampleButton::getPlayingState() const {
 }
 
 
-void SampleButton::setFile(const juce::String &newFile) { 
-    selectedFilePath = newFile;
-    juce::File selectedFile(newFile);
-    setButtonText(selectedFile.getFileName());
+void SampleButton::setFile(const juce::String &newFile) {
+
+    if (!newFile.isEmpty() && juce::File::isAbsolutePath(newFile)) {
+        juce::File selectedFile(newFile);
+
+        if (selectedFile.existsAsFile()) {
+            selectedFilePath = newFile;
+            setButtonText(selectedFile.getFileName());
+            APVTSRef.state.setProperty(APVTSName, selectedFilePath, nullptr);
+        }
+
+    } else {
+      // Handle invalid file path (e.g., set to nullptr, show "No Sample", etc.)
+        selectedFilePath = "";
+        setButtonText(originalButtonText);
+        APVTSRef.state.setProperty(APVTSName, "", nullptr);
+    }
+
+    DBG(APVTSName);
+
+    if (onFileSelected)
+      onFileSelected(selectedFilePath);
     repaint();
-}
+  }
 
 void SampleButton::timerCallback() {
     flashOn = !flashOn;

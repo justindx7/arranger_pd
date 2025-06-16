@@ -39,7 +39,7 @@ private:
 
 class SampleButton : public juce::TextButton, private juce::Timer {
 public:
-    SampleButton(const juce::String& buttonText);
+    SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference);
     ~SampleButton () override;
 
     void mouseEnter(const juce::MouseEvent& event) override;
@@ -58,6 +58,7 @@ public:
 
     void setFile(const juce::String &newFile);
 
+
     std::function<void()> onEditModeClick;
     std::function<void()> onNormalClick;
 
@@ -67,7 +68,10 @@ protected:
 private:
 
     juce::String originalButtonText;
+    juce::String APVTSName;
 
+
+    juce::AudioProcessorValueTreeState& APVTSRef;
 
     juce::String audioFileWildcard = "*.wav;*.mp3;*.aiff;*.flac;*.ogg";
     std::unique_ptr<juce::FileChooser> fileChooser;
@@ -82,6 +86,22 @@ private:
     juce::String selectedFilePath;
     std::function<void(juce::String)> onFileSelected;
 
+    juce::String makeValidXmlName(const juce::String &name) {
+      juce::String result;
+      for (int i = 0; i < name.length(); ++i) {
+        juce::juce_wchar c = name[i];
+        if ((i == 0 && (juce::CharacterFunctions::isLetter(c) || c == '_')) ||
+            (i > 0 &&
+             (juce::CharacterFunctions::isLetterOrDigit(c) || c == '_'))) {
+          result += c;
+        } else {
+          result += '_'; // Replace illegal chars with underscore
+        }
+      }
+      if (result.isEmpty())
+        result = "_";
+      return result;
+    }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleButton )
 };
