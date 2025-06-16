@@ -11,13 +11,19 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo &AudioSource);
     void loadSample();
     void playSample();
+    void stopSample();
+    void setLooping(bool isLooping);
     double getSampleLengthInSec();
     void setSample(const juce::String &fileLocation);
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    double getCurrentPosition() const { return transportSource.getCurrentPosition();}
+
+    void setGain(double gain) { transportSource.setGain(gain);}
 
     std::function<void()> onSampleStopped;
 
      juce::ResamplingAudioSource* getSource() {return resamplingSource.get();}
+     void setPlaybackSpeed(double speed) { playBackSpeed = speed; }
 
 private:
     void onSampleFinished();
@@ -34,6 +40,7 @@ private:
     bool loaded = false;
     bool transportJustStopped = false;
     bool needsLoading = false;
+    bool shouldLoop = false;
 
     double playBackSpeed = 1.0;
     // TODO make an arranger helper that has all the buttons that it needs as one object that than can be loaded as a full component

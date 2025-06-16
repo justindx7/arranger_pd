@@ -1,8 +1,8 @@
 #pragma once
-
 #include <JuceHeader.h>
 #include "../handlers/AudioFileHandler.h"
 #include "../gui/SampleButton.h"
+#include "juce_core/system/juce_PlatformDefs.h"
 
 class ArrangerLogic {
 public:
@@ -17,7 +17,7 @@ public:
         mixer.prepareToPlay(bufferSize, sampleRate); 
 
         for (auto& [section, info] : sections) {
-            if (info.player) {
+            if(info.player) {
                 info.player->prepareToPlay(sampleRate, bufferSize);
                 mixer.addInputSource(info.player->getSource(), false);
             }
@@ -26,10 +26,12 @@ public:
 
     void releaseSources() {
         for (auto& [section, info] : sections) {
-            if (info.player)
+            if(info.player)
                 info.player->releaseSources();
         }
     }
+
+    void update();
 
     juce::MixerAudioSource &getMixer() {
         return mixer;
@@ -56,38 +58,126 @@ private:
     std::array<SampleButton, 4>* fillInsPtr = nullptr;
     SampleButton* outroPtr = nullptr;
 
+    double BPM = 128;
+    bool sectionChangePending = false;
+
+    void handleSectionEnd(ArrangerLogic::ArrangerSection next);
+    void handleSectionStart();
+
   struct SectionInfo {
     std::unique_ptr<AudioFileHandler> player; // Use unique_ptr
+    SampleButton* sampleButton = nullptr;
+    ArrangerLogic* arrangerLogic = nullptr;
+
+    std::unordered_set<double> barLocations;
+
     int barAmount = 0;
     bool isLoop = false;
+
     ArrangerSection nextSection = ArrangerSection::None;
-    std::function<void()> onButtonPressed;
+
     bool isPlaying = false;
+    ArrangerSection thisSection;
+
+    void setSpeed () {
+       player->setPlaybackSpeed(1.0);
+    }
+
+    void calculate() {
+        double beatLengthMS = 60000 / arrangerLogic->BPM;
+        double barLengthMS = 4 * beatLengthMS;
+        double bars = round((player->getSampleLengthInSec() * 1000) / barLengthMS);
+        barAmount = bars;
+        DBG("Amount of Bars for: "<<arrangerLogic->BPM<<"BPM: " << bars);
+
+        for(int i = 1; i < bars; i++) {
+            barLocations.insert(barLengthMS * i);            
+        }
+
+    }
+
+    void play() {
+
+    if (sampleButton->getSelectedFilePath() != "") {
+      
+    arrangerLogic->currentSection = thisSection;
+    arrangerLogic->nextSection = nextSection;
+    isPlaying = true;
+    player->playSample();
+
+    juce::MessageManager::callAsync([buttonPtr = sampleButton] {
+            if (buttonPtr)
+                buttonPtr->setPlayingState(true);
+            });
+
+        } else {
+            arrangerLogic->currentSection = ArrangerSection::None;
+        }
+    }
+
+    void stop() {
+      isPlaying = false;
+      player->stopSample();
+
+      if(isLoop)
+        player->loadSample();
+
+      juce::MessageManager::callAsync([buttonPtr = sampleButton] {
+        if (buttonPtr)
+          buttonPtr->setPlayingState(false);
+      });
+    }
+
+    void prepare() {
+        if (sampleButton && player) {
+            player->setSample(sampleButton->getSelectedFilePath());
+            player->loadSample();
+            player->setLooping(isLoop);
+    
+            sampleButton->onNormalClick = [&]() {
+
+
+              if (arrangerLogic->currentSection == ArrangerSection::None) {
+                  play();
+              } else {
+                arrangerLogic->nextSection = thisSection;
+                arrangerLogic->sectionChangePending = true;
+
+              }
+            };
+
+            player->onSampleStopped = [&]() { 
+                isPlaying = false; 
+                sampleButton->setPlayingState(false);
+
+              if (arrangerLogic->sectionChangePending) {
+                arrangerLogic->handleSectionEnd(arrangerLogic->nextSection);
+                arrangerLogic->sectionChangePending = false;
+                if(isLoop){player->loadSample();}
+
+              } else if (isLoop) {
+                arrangerLogic->handleSectionEnd(thisSection);
+              } else {
+                arrangerLogic->handleSectionEnd(nextSection);
+              }
+
+
+            };
+
+            sampleButton->setFileSelectedCallback([&](juce::String filePath) {
+              player->setSample(filePath);
+              player->loadSample();
+              calculate();
+            });
+        }
+        calculate();
+    }
+
   };
 
   std::map<ArrangerSection,SectionInfo> sections;
   ArrangerSection currentSection = ArrangerSection::None;
   ArrangerSection nextSection = ArrangerSection::None;
-
-  void introPressed() {
-    sections[ArrangerSection::Intro].isPlaying = true;
-    sections[ArrangerSection::Intro].player->playSample();
-    introPtr->setPlayingState(true);
-
-    sections[ArrangerSection::Intro].player->onSampleStopped = [this]() {
-        introPtr->setPlayingState(false);
-    };
-  }
-
-  void outroPressed() {
-      sections[ArrangerSection::Outro].isPlaying = true;
-      sections[ArrangerSection::Outro].player->playSample();
-  }
-  void versePressed();
-  void fillInPressed();
-
   juce::MixerAudioSource mixer;
 
-
-void registerInfoCallbacks(SampleButton &intro,std::array<SampleButton, 4> &verses, std::array<SampleButton, 4> &fillIns,SampleButton &outro);
 };

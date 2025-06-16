@@ -10,18 +10,18 @@ void AudioFileHandler::prepareToPlay(double sampleRate, int bufferSize) {
     resamplingSource = std::make_unique<juce::ResamplingAudioSource>(&transportSource, false);
     resamplingSource->prepareToPlay(bufferSize, sampleRate);
     loadSample();
+
 }
 
 void AudioFileHandler::releaseSources() {
     if(resamplingSource)
         resamplingSource->releaseResources();
-
     transportSource.releaseResources();
 }
 
 
 double AudioFileHandler::getSampleLengthInSec() {
-    return transportSource.getLengthInSeconds() / resamplingSource->getResamplingRatio();
+    return transportSource.getLengthInSeconds();
 }
 
 void AudioFileHandler::getNextAudioBlock(const juce::AudioSourceChannelInfo &AudioSource) {
@@ -34,15 +34,13 @@ void AudioFileHandler::getNextAudioBlock(const juce::AudioSourceChannelInfo &Aud
 }
 
 void AudioFileHandler::onSampleFinished() {
-  DBG("Sample Finised");
-
-  if(onSampleStopped){
+    if (onSampleStopped) {
       onSampleStopped();
-  }
+    }
 
-  if (needsLoading) {
+    if (needsLoading && !shouldLoop) {
       loadSample();
-  }
+    }
 }
 
 void AudioFileHandler::changeListenerCallback(juce::ChangeBroadcaster *source) {
@@ -65,6 +63,7 @@ void AudioFileHandler::setSample(const juce::String &fileLocation) {
 }
 
 void AudioFileHandler::loadSample() {
+if(fileName != currentlyLoadedFile || needsLoading) {
 
     if (!transportSource.isPlaying()) {
         loaded = false;
@@ -76,6 +75,8 @@ void AudioFileHandler::loadSample() {
                             //.getChildFile("songdata/test.wav");
 
         auto testFile = juce::File(fileName);
+        DBG("Currently Loaded: " << currentlyLoadedFile);
+        DBG("Now Loading: " << fileName);
 
         if (testFile.existsAsFile()) {
             std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(testFile));
@@ -93,10 +94,25 @@ void AudioFileHandler::loadSample() {
         }
     }
 }
+}
 
 void AudioFileHandler::playSample() {
     if (loaded && !transportSource.isPlaying() && currentlyLoadedFile !="") {
+        DBG("PLAYING: " << currentlyLoadedFile << " " << transportSource.getTotalLength());
         transportSource.setPosition(0.0);
         transportSource.start();
     }
 }
+
+
+void AudioFileHandler::stopSample() {
+    transportSource.setSource(nullptr);
+    transportSource.stop();
+    transportSource.setSource(readerSource.get(), 0, nullptr,
+                              readerSource->getAudioFormatReader()->sampleRate);
+}
+
+void AudioFileHandler::setLooping(bool isLooping) {
+    shouldLoop = isLooping;
+}
+

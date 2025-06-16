@@ -37,6 +37,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 
     sample1.onNormalClick = [&]() {
+        sample1.setPlayingState(true);
         p.testPlayer.playSample(); 
     };
 
