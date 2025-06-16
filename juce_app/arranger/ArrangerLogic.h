@@ -12,24 +12,27 @@ public:
 
    // return function to getNextAudioBlock of all the players form the sections 
 
-
     void prepareToPlay(double sampleRate, int bufferSize) {
+        mixer.removeAllInputs(); 
+        mixer.prepareToPlay(bufferSize, sampleRate); 
+
         for (auto& [section, info] : sections) {
-            if (info.player)
+            if (info.player) {
                 info.player->prepareToPlay(sampleRate, bufferSize);
+                mixer.addInputSource(info.player->getSource(), false);
+            }
         }
     }
+
     void releaseSources() {
         for (auto& [section, info] : sections) {
             if (info.player)
                 info.player->releaseSources();
         }
     }
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo &AudioSource) {
-        for (auto& [section, info] : sections) {
-            if (info.isPlaying && info.player)
-                info.player->getNextAudioBlock(AudioSource);
-        }
+
+    juce::MixerAudioSource &getMixer() {
+        return mixer;
     }
 
 private:
@@ -82,6 +85,8 @@ private:
   }
   void versePressed();
   void fillInPressed();
+
+  juce::MixerAudioSource mixer;
 
 
 void registerInfoCallbacks(SampleButton &intro,std::array<SampleButton, 4> &verses, std::array<SampleButton, 4> &fillIns,SampleButton &outro);

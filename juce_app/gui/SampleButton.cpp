@@ -93,6 +93,7 @@ void SampleButton::clicked()
     }
     else
     {
+        setPlayingState(true);
         if (onNormalClick)
             onNormalClick();
     }

@@ -28,9 +28,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     p.testPlayer.setSample(sample1.getSelectedFilePath());
     p.testPlayer.loadSample();
+
     // callback to set change current sample
     sample1.setFileSelectedCallback([&](juce::String filePath) {
-            DBG("Called");
             p.testPlayer.setSample(filePath);
             p.testPlayer.loadSample();
     });
@@ -38,7 +38,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     sample1.onNormalClick = [&]() {
         p.testPlayer.playSample(); 
-        sample1.setPlayingState(true);
     };
 
     p.testPlayer.onSampleStopped = [this]() {
@@ -58,7 +57,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     sample2.onNormalClick = [&]() {
         p.testPlayer2.playSample(); 
-        sample2.setPlayingState(true);
     };
 
     p.testPlayer2.onSampleStopped = [this]() {

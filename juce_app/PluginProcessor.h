@@ -47,14 +47,11 @@ public:
 
     AudioFileHandler testPlayer;
     AudioFileHandler testPlayer2;
-    juce::AudioProcessorValueTreeState &getAPVTS() { return parameters; }
 
     ArrangerLogic arrangerLogic;
 
   private:
     //==============================================================================
-    juce::MixerAudioSource mixer;
-
     
     MidiHandler midiHandler;
     

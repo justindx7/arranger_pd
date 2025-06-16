@@ -101,16 +101,14 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    mixer.removeAllInputs(); 
-    mixer.prepareToPlay(samplesPerBlock, sampleRate); 
 
     
     testPlayer.prepareToPlay(sampleRate,samplesPerBlock);  
     testPlayer2.prepareToPlay(sampleRate,samplesPerBlock);  
     arrangerLogic.prepareToPlay(sampleRate,samplesPerBlock);
 
-    mixer.addInputSource(testPlayer.getSource(), false);
-    mixer.addInputSource(testPlayer2.getSource(), false);
+    arrangerLogic.getMixer().addInputSource(testPlayer.getSource(), false);
+    arrangerLogic.getMixer().addInputSource(testPlayer2.getSource(), false);
 
 }
 
@@ -165,10 +163,9 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    mixer.getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
 
+    arrangerLogic.getMixer().getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
 
-    arrangerLogic.getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
 
     //
     // This is the place where you'd normally do the guts of your plugin's
