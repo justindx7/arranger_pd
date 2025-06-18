@@ -4,6 +4,7 @@
 #include <array>
 #include "arranger/ArrangerLogic.h"
 #include "gui/SampleButton.h"
+#include "gui/PresetPanel.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
@@ -36,7 +37,18 @@ private: // This reference is provided as a quick way for your editor to access 
     std::array<SampleButton, 4> fillInButtons { SampleButton{"Fill-In 1", Reference}, SampleButton{"Fill-In 2", Reference}, SampleButton{"Fill-In 3", Reference}, SampleButton{"Fill-In 4", Reference} };
     SampleButton outroButton {"Outro", Reference};
 
+    juce::TextButton showPresetPanelButton{"Presets"};
+    std::unique_ptr<PresetPanel> presetPanel;
 
+    void showPresetPanel() {
+      presetPanel = std::make_unique<PresetPanel>(processorRef.getPresetManager(), [this] {
+        presetPanel.reset();
+        // Optionally repaint or update UI
+      });
+      addAndMakeVisible(*presetPanel);
+      presetPanel->setBounds(getLocalBounds());
+      presetPanel->toFront(true);
+    }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };

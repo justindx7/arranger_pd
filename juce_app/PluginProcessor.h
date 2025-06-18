@@ -3,6 +3,7 @@
 #include "handlers/AudioFileHandler.h"
 #include "handlers/MidiHandler.h"
 #include "arranger/ArrangerLogic.h"
+#include "service/PresetManager.h"
 #include <JuceHeader.h>
 
 //==============================================================================
@@ -45,6 +46,8 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    PresetManager& getPresetManager(){return *presetManager;}
+
     AudioFileHandler testPlayer;
     AudioFileHandler testPlayer2;
 
@@ -52,7 +55,11 @@ public:
 
   private:
     //==============================================================================
-    
+     
+
+    std::unique_ptr<PresetManager> presetManager;
+
+
     MidiHandler midiHandler;
     
     juce::AudioProcessorValueTreeState parameters;

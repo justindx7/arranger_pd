@@ -10,7 +10,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // editor's size to whatever you need it to be.
 
     
-    
+
+    addAndMakeVisible(showPresetPanelButton);
+    showPresetPanelButton.onClick = [this] () {showPresetPanel();};
 
     addAndMakeVisible(gainSlider);
     gainAttachment = std::make_unique<SliderAttachment>(Reference, "uGain", gainSlider);
@@ -109,6 +111,7 @@ void AudioPluginAudioProcessorEditor::resized()
     auto sliderLeft = 120;
     gainSlider.setBounds(getWidth()/4, getHeight()/2, getWidth() - sliderLeft - 120, 120);
 
+    showPresetPanelButton.setBounds (50, 10, 100, 30);
     sample1.setBounds (50, 40, 100, 30);
     sample2.setBounds (50, 80, 100, 30);
     editModeButton.setBounds (50, 120, 100, 30);
@@ -129,6 +132,8 @@ void AudioPluginAudioProcessorEditor::resized()
     }
 
     outroButton.setBounds(x, y, w, h);
+    if(presetPanel)
+        presetPanel->setBounds(getLocalBounds());
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
 }

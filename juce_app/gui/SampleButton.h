@@ -37,7 +37,7 @@ private:
 };
 
 
-class SampleButton : public juce::TextButton, private juce::Timer {
+class SampleButton : public juce::TextButton,public juce::ValueTree::Listener, private juce::Timer {
 public:
     SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference);
     ~SampleButton () override;
@@ -57,6 +57,8 @@ public:
     bool getPlayingState() const;
 
     void setFile(const juce::String &newFile);
+    void saveState();
+    void restoreState();
 
 
     std::function<void()> onEditModeClick;
@@ -66,6 +68,10 @@ protected:
     void paintButton(juce::Graphics&, bool isMouseOverButton, bool isButtonDown) override;
 
 private:
+    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
+    void valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child) override;
+    void valueTreeChildRemoved(juce::ValueTree& parent, juce::ValueTree& child, int) override;
+    //void valueTreeChildChanged(juce::ValueTree& parent, juce::ValueTree& child)
 
     juce::String originalButtonText;
     juce::String APVTSName;

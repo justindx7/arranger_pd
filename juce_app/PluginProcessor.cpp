@@ -19,10 +19,14 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                                                                                      startingValues[i]));   
     }
 
-
     parameters.replaceState(juce::ValueTree("Parameters"));
-
     gainParameter = parameters.getRawParameterValue("uGain");
+
+    parameters.state.setProperty(PresetManager::presetNameProperty, "", nullptr);
+    parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
+    presetManager = std::make_unique<PresetManager>(parameters);
+
+
 
 }
 

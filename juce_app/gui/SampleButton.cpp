@@ -8,15 +8,20 @@ SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorV
     originalButtonText = buttonText;
     setButtonText(originalButtonText);
     APVTSName = makeValidXmlName(originalButtonText) + "Path";
-    juce::String apvts = APVTSRef.state.getProperty(APVTSName);
-    setFile(apvts);
+
+    APVTSRef.state.addListener(this);
+    APVTSRef.state.getOrCreateChildWithName(APVTSName, nullptr);
+    restoreState();
 
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
     //setColour(juce::TextButton::textColourOffId, juce::Colours::white);
 }
 
-SampleButton::~SampleButton() = default;
+SampleButton::~SampleButton() {
+    
+    APVTSRef.state.removeListener(this);
+}
 
 void SampleButton::mouseEnter(const juce::MouseEvent& event)
 {
@@ -124,31 +129,44 @@ bool SampleButton::getPlayingState() const {
     return isPlaying;
 }
 
+void SampleButton::saveState() {
+    auto buttonNode = APVTSRef.state.getOrCreateChildWithName(APVTSName, nullptr);
+    buttonNode.setProperty("filePath", selectedFilePath, nullptr);
+}
+
+void SampleButton::restoreState() {
+    auto buttonNode = APVTSRef.state.getChildWithName(APVTSName);
+    if (buttonNode.isValid())
+    {
+        setFile(buttonNode["filePath"].toString());
+    }
+}
 
 void SampleButton::setFile(const juce::String &newFile) {
-
+if(selectedFilePath != newFile) {
     if (!newFile.isEmpty() && juce::File::isAbsolutePath(newFile)) {
         juce::File selectedFile(newFile);
 
         if (selectedFile.existsAsFile()) {
             selectedFilePath = newFile;
             setButtonText(selectedFile.getFileName());
-            APVTSRef.state.setProperty(APVTSName, selectedFilePath, nullptr);
+            saveState();
         }
 
     } else {
       // Handle invalid file path (e.g., set to nullptr, show "No Sample", etc.)
         selectedFilePath = "";
         setButtonText(originalButtonText);
-        APVTSRef.state.setProperty(APVTSName, "", nullptr);
+        saveState();
     }
 
-    DBG(APVTSName);
 
     if (onFileSelected)
       onFileSelected(selectedFilePath);
     repaint();
+    }
   }
+
 
 void SampleButton::timerCallback() {
     flashOn = !flashOn;
@@ -164,6 +182,24 @@ void SampleButton::stopFlashing() {
     stopTimer();
     flashOn = false;
     repaint();
+}
+void SampleButton::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) {
+}
+
+void SampleButton::valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child)
+{
+    if (parent == APVTSRef.state && child.hasType(APVTSName))
+    {
+        restoreState();
+    }
+}
+
+void SampleButton::valueTreeChildRemoved(juce::ValueTree& parent, juce::ValueTree& child, int)
+{
+    if (parent == APVTSRef.state && child.hasType(APVTSName))
+    {
+        restoreState();
+    }
 }
 
 void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
