@@ -6,7 +6,6 @@ list(APPEND CMAKE_PREFIX_PATH "~/.local/lib/JUCE")
 
 find_package(JUCE CONFIG REQUIRED)
 
-
 juce_add_plugin(Arranger
         VERSION 0.0.1
         COMPANY_NAME Application
@@ -16,37 +15,37 @@ juce_add_plugin(Arranger
         PRODUCT_NAME "Arranger"
 )
 
-
 juce_generate_juce_header(Arranger)
 
-file(GLOB HANDLER_FILES    
-    "handlers/*.cpp"
-)
+file(GLOB HANDLER_FILES "handlers/*.cpp")
+file(GLOB GUI_FILES "gui/*.cpp")
+file(GLOB ARRANGER_FILES "arranger/*.cpp")
+file(GLOB SERVICE_FILES "service/*.cpp")
 
-file(GLOB GUI_FILES    
-    "gui/*.cpp"
+set(ALL_SOURCE_FILES
+    PluginEditor.cpp
+    PluginProcessor.cpp
+    ${HANDLER_FILES}
+    ${GUI_FILES}
+    ${ARRANGER_FILES}
+    ${SERVICE_FILES}
 )
 
 target_sources(Arranger
         PRIVATE
-        PluginEditor.cpp
-        PluginProcessor.cpp
-        ${HANDLER_FILES}
-        ${GUI_FILES}
-        )
+        ${ALL_SOURCE_FILES}
+)
 
-        target_compile_definitions(Arranger
+target_compile_definitions(Arranger
         PUBLIC
         JUCE_REPORT_APP_USAGE=0
-        # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        JUCE_WEB_BROWSER=0  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
-        JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
-        JUCE_VST3_CAN_REPLACE_VST2=0)
-
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_VST3_CAN_REPLACE_VST2=0
+)
 
 target_link_libraries(Arranger
         PRIVATE
-        # AudioPluginData           # If we'd created a binary data target, we'd link to it here
         juce::juce_audio_utils
         juce::juce_dsp
         juce::juce_audio_formats
@@ -55,36 +54,28 @@ target_link_libraries(Arranger
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
-        )
+)
 target_compile_features(Arranger PRIVATE cxx_std_20)
 target_compile_options(Arranger  PRIVATE -Ofast)
 
 find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
-
-find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
 if (CMAKE_CXX_CPPCHECK)
     message("-- CPPCHECK FOUND")
-    list(
-        APPEND CMAKE_CXX_CPPCHECK 
-            "--enable=warning"
-            "--inconclusive"
-            "--suppress=missingInclude"
-            "--force" 
-            "--inline-suppr"
-            "--suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSupressions.txt"
-            "--error-exitcode=1"
-            "--verbose"  # Optional: adds more detailed output
-    )
     add_custom_target(
         cppcheck
         COMMAND ${CMAKE_CXX_CPPCHECK}
-            ${CMAKE_SOURCE_DIR}/PluginEditor.cpp
-            ${CMAKE_SOURCE_DIR}/PluginProcessor.cpp
-            ${CMAKE_SOURCE_DIR}/${HANDLER_FILES}
-            ${CMAKE_SOURCE_DIR}/${GUI_FILES}
+            --enable=warning
+            --inconclusive
+            --suppress=missingInclude
+            --check-level=exhaustive
+            --force
+            --inline-suppr
+            --suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSupressions.txt
+            --error-exitcode=1
+            --verbose
+            ${ALL_SOURCE_FILES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
-
+    add_dependencies(Arranger cppcheck)
 endif()
-
-add_dependencies(Arranger cppcheck)
 
