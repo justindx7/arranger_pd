@@ -38,7 +38,7 @@ void AudioFileHandler::onSampleFinished() {
       onSampleStopped();
     }
 
-    if (needsLoading && !shouldLoop) {
+    if (needsLoading && shouldLoadOnStop) {
       loadSample();
     }
 }
@@ -112,7 +112,7 @@ void AudioFileHandler::stopSample() {
                               readerSource->getAudioFormatReader()->sampleRate);
 }
 
-void AudioFileHandler::setLooping(bool isLooping) {
-    shouldLoop = isLooping;
+void AudioFileHandler::shouldloadOnStop(bool loadOnStop){
+    shouldLoadOnStop = loadOnStop;
 }
 

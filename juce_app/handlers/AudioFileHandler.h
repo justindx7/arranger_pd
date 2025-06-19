@@ -12,13 +12,15 @@ public:
     void loadSample();
     void playSample();
     void stopSample();
-    void setLooping(bool isLooping);
+
+    void shouldloadOnStop(bool loadOnStop);
+
     double getSampleLengthInSec();
     void setSample(const juce::String &fileLocation);
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     double getCurrentPosition() const { return transportSource.getCurrentPosition();}
 
-    void setGain(double gain) { transportSource.setGain(gain);}
+    void setGain(float gain) { transportSource.setGain(gain);}
 
     std::function<void()> onSampleStopped;
 
@@ -40,7 +42,7 @@ private:
     bool loaded = false;
     bool transportJustStopped = false;
     bool needsLoading = false;
-    bool shouldLoop = false;
+    bool shouldLoadOnStop = true;
 
     double playBackSpeed = 1.0;
     // TODO make an arranger helper that has all the buttons that it needs as one object that than can be loaded as a full component

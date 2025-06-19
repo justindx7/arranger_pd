@@ -132,7 +132,7 @@ private:
         if (sampleButton && player) {
             player->setSample(sampleButton->getSelectedFilePath());
             player->loadSample();
-            player->setLooping(isLoop);
+            player->shouldloadOnStop(!isLoop);
     
             sampleButton->onNormalClick = [&]() {
 
