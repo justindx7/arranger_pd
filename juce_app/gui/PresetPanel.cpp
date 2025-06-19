@@ -79,9 +79,9 @@ void PresetPanel::paint(juce::Graphics& g)
 
         // Draw preset name and MIDI assignment if present
         juce::String displayText = presets[i];
-        if (midiProgramAssignments.contains(presets[i]))
+        if (manager.getMidiProgramAssignments().contains(presets[i]))
         {
-            int midiNum = midiProgramAssignments[presets[i]];
+            int midiNum = manager.getMidiProgramAssignments()[presets[i]];
             displayText += "   [MIDI: " + juce::String(midiNum) + "]";
         }
         g.drawText(displayText, itemArea.reduced(20, 0), juce::Justification::centredLeft);
@@ -161,7 +161,7 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
         if (yesBtn.contains(e.getPosition()))
         {
             manager.deletePreset(presetToDelete);
-            midiProgramAssignments.remove(presetToDelete);
+            manager.removeMidiProgram(presetToDelete);
             showDeletePopup = false;
             refreshPresetList();
             return;
@@ -195,7 +195,7 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
                 [this, presetName = presets[i]](int midiNum) {
                     // Only assign if this midiNum is not already assigned to another preset
                     bool alreadyAssigned = false;
-                    for (auto it = midiProgramAssignments.begin(); it != midiProgramAssignments.end(); ++it)
+                    for (auto it = manager.getMidiProgramAssignments().begin(); it != manager.getMidiProgramAssignments().end(); ++it)
                     {
                         const juce::String& key = it.getKey();
                         int value = it.getValue();
@@ -205,16 +205,18 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
                             break;
                         }
                     }
-                    if (!alreadyAssigned)
-                        midiProgramAssignments.set(presetName, midiNum);
-                    else
+                    if (!alreadyAssigned) {
+                            manager.assignMidiProgram(presetName, midiNum);
+
+                    } else {
                         juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
                             "MIDI Program Assignment",
                             "This MIDI program number is already assigned to another preset.");
+                    }
                     repaint();
                 },
                 [this, presetName = presets[i]] {
-                    midiProgramAssignments.remove(presetName);
+                    manager.removeMidiProgram(presetName);
                     repaint();
                 }
             );

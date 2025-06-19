@@ -145,3 +145,24 @@ juce::String PresetManager::getCurrentPreset() {
 void PresetManager::valueTreeRedirected(juce::ValueTree &treeWhichHasBeenChanged) {
     currentPreset.referTo(treeWhichHasBeenChanged.getPropertyAsValue(presetNameProperty, nullptr));
 }
+
+void PresetManager::assignMidiProgram(const juce::String &presetName,int midiProgram) {
+
+  midiProgramAssignments.set(presetName, midiProgram);
+  for (auto it = midiProgramAssignments.begin();it != midiProgramAssignments.end(); ++it) {
+    midiProgramToPreset.set(it.getValue(), it.getKey());
+  }
+}
+
+void PresetManager::removeMidiProgram(const juce::String &presetName) {
+  midiProgramAssignments.remove(presetName);
+
+  for (auto it = midiProgramAssignments.begin();it != midiProgramAssignments.end(); ++it) {
+    midiProgramToPreset.set(it.getValue(), it.getKey());
+  }
+}
+
+juce::String PresetManager::getPresetNameForMidiProgram(int midiProgram) const {
+    return midiProgramToPreset[midiProgram];
+}
+

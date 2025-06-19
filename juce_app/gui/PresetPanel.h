@@ -27,7 +27,6 @@ private:
     static constexpr int presetsPerPage = 7;
 
     juce::HashMap<int, juce::Rectangle<int>> presetItemAreas, deleteButtonAreas;
-    juce::HashMap<juce::String, int> midiProgramAssignments;
     juce::HashMap<int, juce::Rectangle<int>> midiButtonAreas;
 
     // Delete popup

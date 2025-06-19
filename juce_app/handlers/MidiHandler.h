@@ -1,8 +1,9 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "../service/PresetManager.h"
 
 class MidiHandler {
 public:
-  void logMidiMessages(const juce::MidiBuffer &midiMessages);
+  void logMidiMessages(const juce::MidiBuffer &midiMessages, const PresetManager &manager);
 };

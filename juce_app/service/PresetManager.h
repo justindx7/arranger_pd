@@ -13,14 +13,23 @@ public:
   void savePreset(const juce::String &presetName);
   void deletePreset(const juce::String &presetName);
   void loadPreset(const juce::String &presetName);
+
   int loadNextPreset();
   int loadPreviousPreset();
 
+  void assignMidiProgram(const juce::String &presetName, int midiProgram);
+  void removeMidiProgram(const juce::String &presetName);
+  juce::String getPresetNameForMidiProgram(int midiProgram) const;
+
   static juce::StringArray getAllPresets();
   juce::String getCurrentPreset();
+  
+  const juce::HashMap<juce::String, int> &getMidiProgramAssignments() { return midiProgramAssignments; }
 
 private:
   void valueTreeRedirected(juce::ValueTree &treeWhichHasBeenChanged) override;
+  juce::HashMap<juce::String, int> midiProgramAssignments;
+  juce::HashMap<int, juce::String> midiProgramToPreset;
 
   juce::AudioProcessorValueTreeState &valueTreeState;
   juce::Value currentPreset;
