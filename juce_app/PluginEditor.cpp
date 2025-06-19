@@ -14,16 +14,23 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(showPresetPanelButton);
     showPresetPanelButton.onClick = [this] () {showPresetPanel();};
 
-    addAndMakeVisible(gainSlider);
-    gainAttachment = std::make_unique<SliderAttachment>(Reference, "uGain", gainSlider);
+    addAndMakeVisible(bpmSlider);
+    bpmAttachment = std::make_unique<SliderAttachment>(Reference, "uBPM", bpmSlider);
+
+    bpmSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    addAndMakeVisible(bpmSliderLabel);
+    bpmSliderLabel.setText("BPM", juce::dontSendNotification);
+    bpmSliderLabel.attachToComponent(&bpmSlider, true);
 
 
-    gainSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
-    addAndMakeVisible(gainSlider);
-    gainSliderLabel.setText("Gain", juce::dontSendNotification);
-    gainSliderLabel.attachToComponent(&gainSlider, true);
 
+    addAndMakeVisible(stretchSlider);
+    stretchAttachment = std::make_unique<SliderAttachment>(Reference, "uStretch", stretchSlider);
 
+    stretchSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    addAndMakeVisible(stretchSliderLabel);
+    stretchSliderLabel.setText("Offset", juce::dontSendNotification);
+    stretchSliderLabel.attachToComponent(&stretchSlider, true);
 
 
     addAndMakeVisible(sample1);
@@ -109,7 +116,8 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 void AudioPluginAudioProcessorEditor::resized()
 {
     auto sliderLeft = 120;
-    gainSlider.setBounds(getWidth()/4, getHeight()/2, getWidth() - sliderLeft - 120, 120);
+   bpmSlider.setBounds(getWidth()/4, getHeight()/2, getWidth() - sliderLeft - 120, 120);
+   stretchSlider.setBounds(getWidth()/4, (getHeight()/2) + 50, getWidth() - sliderLeft - 120, 120);
 
     showPresetPanelButton.setBounds (50, 10, 100, 30);
     sample1.setBounds (50, 40, 100, 30);

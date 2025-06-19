@@ -3,7 +3,6 @@
 #include "handlers/AudioFileHandler.h"
 #include "handlers/MidiHandler.h"
 #include "arranger/ArrangerLogic.h"
-#include "juce_dsp/juce_dsp.h"
 #include "service/PresetManager.h"
 #include <JuceHeader.h>
 
@@ -64,21 +63,24 @@ public:
     
     juce::AudioProcessorValueTreeState parameters;
 
-    static constexpr int numParameters = 1;
+    static constexpr int numParameters = 2;
 
-    std::atomic<float>* gainParameter = nullptr;
+    std::atomic<float>* bpmParameter = nullptr;
+    std::atomic<float>* stretchParameter = nullptr;
 
-    juce::NormalisableRange<float> gainRange = {0.0f, 1.0, 0.01f};
+    juce::NormalisableRange<float> bpmRange = {20.0f, 200.0, 1.0f};
+    juce::NormalisableRange<float> stretchRange = {-10.0f, 10.0, 1.0f};
 
-    float startingValues[numParameters] = {0.f};
+    float startingValues[numParameters] = {100.f, 0.f};
 
-    juce::NormalisableRange<float> normalisableRanges[numParameters] = {gainRange};
+    juce::NormalisableRange<float> normalisableRanges[numParameters] = {bpmRange,stretchRange};
 
-    std::string parameterNames[numParameters] = {"Gain"};
+    std::string parameterNames[numParameters] = {"BPM", "Stretch"};
 
-    juce::ParameterID gainParam{"uGain", 1};
+    juce::ParameterID bpmParam{"uBPM", 1};
+    juce::ParameterID stretchParam{"uStretch", 1};
 
-    juce::ParameterID parameterIDs[numParameters] = {gainParam};
+    juce::ParameterID parameterIDs[numParameters] = {bpmParam, stretchParam};
 
       
     juce::dsp::Limiter<float> limiter;

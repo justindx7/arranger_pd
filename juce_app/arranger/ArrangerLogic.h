@@ -37,6 +37,30 @@ public:
         return mixer;
     }
 
+    void setBPM(double newBPM) {
+      constexpr double epsilon = 1e-6;
+      if (std::abs(BPM - newBPM) > epsilon) {
+        BPM = newBPM;
+        for (auto &[section, info] : sections) {
+          info.calculate();
+        }
+      }
+    }
+
+
+    void setStretch(double newBPMOffset) {
+      constexpr double epsilon = 1e-6;
+      if (std::abs(bpmOffset   - newBPMOffset) > epsilon) {
+        bpmOffset  = newBPMOffset;
+        
+        double speed = (BPM + bpmOffset) / BPM;
+
+        for (auto &[section, info] : sections) {
+          info.setSpeed(speed);
+        }
+      }
+    }
+
 private:
   enum class ArrangerSection {
     Intro,
@@ -58,7 +82,9 @@ private:
     std::array<SampleButton, 4>* fillInsPtr = nullptr;
     SampleButton* outroPtr = nullptr;
 
-    double BPM = 128;
+    double BPM = 0;
+    double bpmOffset = 0;
+
     bool sectionChangePending = false;
 
     void handleSectionEnd(ArrangerLogic::ArrangerSection next);
@@ -79,14 +105,14 @@ private:
     bool isPlaying = false;
     ArrangerSection thisSection;
 
-    void setSpeed () {
-       player->setPlaybackSpeed(1.0);
+    void setSpeed (double speed) {
+       player->setPlaybackSpeed(speed);
     }
 
     void calculate() {
         double beatLengthMS = 60000 / arrangerLogic->BPM;
         double barLengthMS = 4 * beatLengthMS;
-        double bars = round((player->getSampleLengthInSec() * 1000) / barLengthMS);
+        double bars =(player->getSampleLengthInSec() * 1000) / barLengthMS;
         barAmount = bars;
         DBG("Amount of Bars for: "<<arrangerLogic->BPM<<"BPM: " << bars);
 
@@ -179,5 +205,4 @@ private:
   ArrangerSection currentSection = ArrangerSection::None;
   ArrangerSection nextSection = ArrangerSection::None;
   juce::MixerAudioSource mixer;
-
 };

@@ -20,7 +20,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     }
 
     parameters.replaceState(juce::ValueTree("Parameters"));
-    gainParameter = parameters.getRawParameterValue("uGain");
+    bpmParameter = parameters.getRawParameterValue("uBPM");
+    stretchParameter = parameters.getRawParameterValue("uStretch");              
 
     parameters.state.setProperty(PresetManager::presetNameProperty, "", nullptr);
     parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
@@ -106,6 +107,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
+
     
     testPlayer.prepareToPlay(sampleRate,samplesPerBlock);  
     testPlayer2.prepareToPlay(sampleRate,samplesPerBlock);  
@@ -178,6 +180,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    arrangerLogic.setBPM(bpmParameter->load());
+    arrangerLogic.setStretch(stretchParameter->load());
     arrangerLogic.update();
     arrangerLogic.getMixer().getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
 

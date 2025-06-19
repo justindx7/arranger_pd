@@ -23,9 +23,14 @@ private: // This reference is provided as a quick way for your editor to access 
     juce::AudioProcessorValueTreeState& Reference;
 
 
-    juce::Slider gainSlider;
-    juce::Label gainSliderLabel;
-    std::unique_ptr<SliderAttachment> gainAttachment;
+    juce::Slider bpmSlider;
+    juce::Label bpmSliderLabel;
+    std::unique_ptr<SliderAttachment> bpmAttachment;
+
+
+    juce::Slider stretchSlider;
+    juce::Label stretchSliderLabel;
+    std::unique_ptr<SliderAttachment> stretchAttachment;
 
     SampleButton sample1 {"sample1.wav", Reference};
     SampleButton sample2{"sample2.wav", Reference};

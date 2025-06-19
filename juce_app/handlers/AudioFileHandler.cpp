@@ -107,12 +107,19 @@ void AudioFileHandler::playSample() {
 
 void AudioFileHandler::stopSample() {
     transportSource.setSource(nullptr);
-    transportSource.stop();
+    //transportSource.stop();
     transportSource.setSource(readerSource.get(), 0, nullptr,
                               readerSource->getAudioFormatReader()->sampleRate);
 }
 
 void AudioFileHandler::shouldloadOnStop(bool loadOnStop){
     shouldLoadOnStop = loadOnStop;
+}
+
+void AudioFileHandler::setPlaybackSpeed(double speed) { 
+    playBackSpeed = speed;
+
+    if (resamplingSource)
+      resamplingSource->setResamplingRatio(playBackSpeed);
 }
 

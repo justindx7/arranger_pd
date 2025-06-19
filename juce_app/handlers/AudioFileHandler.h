@@ -25,7 +25,7 @@ public:
     std::function<void()> onSampleStopped;
 
      juce::ResamplingAudioSource* getSource() {return resamplingSource.get();}
-     void setPlaybackSpeed(double speed) { playBackSpeed = speed; }
+     void setPlaybackSpeed(double speed);
 
 private:
     void onSampleFinished();
