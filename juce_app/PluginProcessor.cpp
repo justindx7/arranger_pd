@@ -114,6 +114,17 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     arrangerLogic.getMixer().addInputSource(testPlayer.getSource(), false);
     arrangerLogic.getMixer().addInputSource(testPlayer2.getSource(), false);
 
+    juce::dsp::ProcessSpec spec;
+
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    limiter.reset();
+    limiter.prepare(spec);
+
+    limiter.setThreshold(-0.1f); // dB
+    limiter.setRelease(50.0f);   // ms
+
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -170,11 +181,16 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     arrangerLogic.update();
     arrangerLogic.getMixer().getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
 
+    // Limiter
+    juce::dsp::AudioBlock<float> audioBlock(buffer);
+    juce::dsp::ProcessContextReplacing<float> context(audioBlock);
+    limiter.process(context);
 
     //
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
+    //
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.

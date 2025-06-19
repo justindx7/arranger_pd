@@ -3,6 +3,7 @@
 #include "handlers/AudioFileHandler.h"
 #include "handlers/MidiHandler.h"
 #include "arranger/ArrangerLogic.h"
+#include "juce_dsp/juce_dsp.h"
 #include "service/PresetManager.h"
 #include <JuceHeader.h>
 
@@ -59,7 +60,6 @@ public:
 
     std::unique_ptr<PresetManager> presetManager;
 
-
     MidiHandler midiHandler;
     
     juce::AudioProcessorValueTreeState parameters;
@@ -81,6 +81,7 @@ public:
     juce::ParameterID parameterIDs[numParameters] = {gainParam};
 
       
+    juce::dsp::Limiter<float> limiter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };
