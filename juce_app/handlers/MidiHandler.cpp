@@ -1,6 +1,6 @@
 #include "MidiHandler.h"
 
-  void MidiHandler::logMidiMessages(const juce::MidiBuffer &midiMessages, const PresetManager &manager) {
+  void MidiHandler::logMidiMessages(const juce::MidiBuffer &midiMessages, PresetManager &manager) {
     for (const auto metadata : midiMessages) {
       const auto msg = metadata.getMessage();
       const auto samplePosition = metadata.samplePosition;
@@ -13,6 +13,10 @@
             << msg.getChannel() << " Program " << programNum << " -> Preset: "
             << (presetName.isNotEmpty() ? presetName : "<none>")
             << " at sample " << samplePosition);
+
+        juce::MessageManager::callAsync([presetManagerPtr = &manager, presetName]() {
+        presetManagerPtr->loadPreset(presetName);
+        });
 
       }else if (msg.isNoteOn()) {
           DBG("Note On:  Channel " << msg.getChannel() << " Note "

@@ -49,7 +49,11 @@ public:
         area.removeFromTop(36); // Reserve space for label
         editor.setBounds(area.removeFromTop(60));
         area.removeFromTop(20);
-        auto buttonArea = area.removeFromTop(40);
+
+        // Increase button height for touch screens
+        const int buttonHeight = 112;
+        auto buttonArea = area.removeFromTop(buttonHeight);
+
         okButton.setBounds(buttonArea.removeFromLeft(buttonArea.getWidth() / 3).reduced(5));
         removeButton.setBounds(buttonArea.removeFromLeft(buttonArea.getWidth() / 2).reduced(5));
         cancelButton.setBounds(buttonArea.reduced(5));

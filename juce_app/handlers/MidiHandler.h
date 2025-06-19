@@ -5,5 +5,5 @@
 
 class MidiHandler {
 public:
-  void logMidiMessages(const juce::MidiBuffer &midiMessages, const PresetManager &manager);
+  void logMidiMessages(const juce::MidiBuffer &midiMessages, PresetManager &manager);
 };

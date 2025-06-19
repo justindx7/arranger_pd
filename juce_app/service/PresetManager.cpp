@@ -4,7 +4,14 @@ const juce::File PresetManager::defaultDirectory{juce::File::getSpecialLocation(
 const juce::String PresetManager::extension{"preset"};
 const juce::String PresetManager::presetNameProperty{"presetName"};
 
+const juce::File PresetManager::midiAssignFile{juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+        .getChildFile("songdata")
+        .getChildFile("midi_assignments.settings")};
+
+
+
 PresetManager::PresetManager(juce::AudioProcessorValueTreeState &apvts): valueTreeState(apvts) {
+  loadMidiAssignments();
 
   if (!defaultDirectory.exists()) {
     const auto makeDir = defaultDirectory.createDirectory();
@@ -93,8 +100,7 @@ void PresetManager::loadPreset(const juce::String &presetName) {
         valueTreeState.state.removeChild(stateChild, nullptr);
         stateChild = valueTreeState.state.getChildWithName(type);
       }
-
-      // Add a copy of the node from the preset
+// Add a copy of the node from the preset
       valueTreeState.state.appendChild(childToLoad.createCopy(), nullptr);
     }
   }
@@ -152,6 +158,7 @@ void PresetManager::assignMidiProgram(const juce::String &presetName,int midiPro
   for (auto it = midiProgramAssignments.begin();it != midiProgramAssignments.end(); ++it) {
     midiProgramToPreset.set(it.getValue(), it.getKey());
   }
+  saveMidiAssignments();
 }
 
 void PresetManager::removeMidiProgram(const juce::String &presetName) {
@@ -160,9 +167,51 @@ void PresetManager::removeMidiProgram(const juce::String &presetName) {
   for (auto it = midiProgramAssignments.begin();it != midiProgramAssignments.end(); ++it) {
     midiProgramToPreset.set(it.getValue(), it.getKey());
   }
+  saveMidiAssignments();
 }
 
 juce::String PresetManager::getPresetNameForMidiProgram(int midiProgram) const {
     return midiProgramToPreset[midiProgram];
 }
 
+void PresetManager::saveMidiAssignments() {
+  juce::PropertiesFile::Options options;
+  options.applicationName = "Arranger";
+  options.filenameSuffix = "settings";
+  options.folderName = "";
+
+  juce::PropertiesFile props(midiAssignFile, options);
+  // Remove all existing keys before saving current assignments
+  auto keys = props.getAllProperties().getAllKeys();
+  for (const auto& key : keys) {
+    props.removeValue(key);
+  }
+
+  for (auto it = midiProgramAssignments.begin(); it != midiProgramAssignments.end(); ++it) {
+    props.setValue(it.getKey(), it.getValue());
+  }
+
+  props.saveIfNeeded();
+}
+
+void PresetManager::loadMidiAssignments(){
+
+  juce::PropertiesFile::Options options;
+  options.applicationName = "Arranger";
+  options.filenameSuffix = "settings";
+  options.folderName = "";
+
+  juce::PropertiesFile props(midiAssignFile,options);
+  midiProgramAssignments.clear();
+  midiProgramToPreset.clear();
+
+  auto keys = props.getAllProperties();
+  for (int i = 0; i < keys.size(); ++i) {
+    auto key = keys.getAllKeys()[i];
+    int midiNum = props.getIntValue(key, -1);
+    if (midiNum > 0) {
+      midiProgramAssignments.set(key, midiNum);
+      midiProgramToPreset.set(midiNum,key);
+    }
+  }
+}

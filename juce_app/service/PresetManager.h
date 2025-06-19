@@ -7,6 +7,8 @@ public:
   static const juce::File defaultDirectory;
   static const juce::String extension;
   static const juce::String presetNameProperty;
+  static const juce::File midiAssignFile;
+
 
   explicit PresetManager(juce::AudioProcessorValueTreeState &);
 
@@ -20,6 +22,9 @@ public:
   void assignMidiProgram(const juce::String &presetName, int midiProgram);
   void removeMidiProgram(const juce::String &presetName);
   juce::String getPresetNameForMidiProgram(int midiProgram) const;
+  
+  void saveMidiAssignments();
+  void loadMidiAssignments();
 
   static juce::StringArray getAllPresets();
   juce::String getCurrentPreset();
