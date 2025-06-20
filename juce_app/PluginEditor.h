@@ -2,6 +2,7 @@
 
 #include "PluginProcessor.h"
 #include <array>
+#include <memory>
 #include "arranger/ArrangerLogic.h"
 #include "gui/SampleButton.h"
 #include "gui/PresetPanel.h"
@@ -29,9 +30,6 @@ private: // This reference is provided as a quick way for your editor to access 
     std::unique_ptr<SliderAttachment> bpmAttachment;
 
 
-    juce::Slider stretchSlider;
-    juce::Label stretchSliderLabel;
-    std::unique_ptr<SliderAttachment> stretchAttachment;
 
 
 
@@ -76,6 +74,8 @@ private: // This reference is provided as a quick way for your editor to access 
     TextButton stopButton { "Stop" };
 
     juce::Slider tempoSlider;
+    std::unique_ptr<SliderAttachment> stretchAttachment;
+
     juce::Slider reverbSlider;
 
     juce::Label tempoLabel { "Tempo", "Tempo" };

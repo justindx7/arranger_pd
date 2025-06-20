@@ -41,22 +41,18 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     int fillNumber = 1;
     for (auto &button : fillsButtons) {
         addAndMakeVisible(button);
-        button.setButtonText("Fill " + juce::String(fillNumber++));
     }
 
     int verseNumber = 1;
     for (auto &button : verseButtons) {
         addAndMakeVisible(button);
-        button.setButtonText("Verse " + juce::String(verseNumber++));
     }
 
     // Add the intro button
     addAndMakeVisible(introButton);
-    introButton.setButtonText("Intro");
 
     // Add the outro button
     addAndMakeVisible(outroButton);
-    outroButton.setButtonText("Outro");
 
 
     addAndMakeVisible(editButton);
@@ -82,17 +78,30 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     p.getArrangerLogic().initSections(introButton, verseButtons, fillsButtons, outroButton);
 
     editButton.setButtonText("Edit");
+
     addAndMakeVisible(stopButton);
     stopButton.setButtonText("Stop");
+    stopButton.onClick = [&] () {
+        p.getArrangerLogic().stop();
+
+        for (size_t i = 0; i < sampleButtons.size(); ++i) {
+            auto& button = sampleButtons[i];
+            if (button.getPlayingState()) {
+                button.setPlayingState(false);
+                p.getSamplePlayers()[i]->stopSample();
+            }
+        }
+    };
     
 
     // Slider for Tempo
     // Add the tempo slider with a range of -10% to +10%, starting at 0%
     addAndMakeVisible(tempoSlider);
+
+    stretchAttachment = std::make_unique<SliderAttachment>(Reference, "uStretch", tempoSlider);
+
     tempoSlider.setSliderStyle(juce::Slider::LinearHorizontal);
-    tempoSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 0, 0);
-    tempoSlider.setRange(-10.0, +10.0, 0.1);
-    tempoSlider.setValue(0.0);
+    tempoSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, true, 0, 0);
     tempoSlider.setTextValueSuffix("BPM");
     // Set the look and feel for the tempo slider
     tempoSlider.setLookAndFeel(&sliderLookAndFeel); // Set custom look and feel for the slider
@@ -102,7 +111,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(tempoLabel);
     // tempoLabel.setText("Tempo", juce::dontSendNotification);
     tempoLabel.setJustificationType(juce::Justification::centred);
-    tempoLabel.setText("0.0 BPM", juce::dontSendNotification);
+    tempoLabel.setText("0 BPM", juce::dontSendNotification);
 
     // update the label when slider value changes
     tempoSlider.onValueChange = [this] {
@@ -184,7 +193,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
     int buttonX = titleBounds.getX();
     int buttonY = titleBounds.getBottom() + titleMargin;
-    showPresetPanelButton.setBounds(buttonX, buttonY, 100, 30);
+    showPresetPanelButton.setBounds(buttonX, buttonY, 100, 60);
 
 
     // Define individual spacings for each group
