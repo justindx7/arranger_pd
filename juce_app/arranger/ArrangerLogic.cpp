@@ -132,3 +132,10 @@ void ArrangerLogic::setStretch(double newBPMOffset) {
     }
   }
 }
+
+void ArrangerLogic::stop() {
+  if (currentSection != ArrangerSection::None) {
+    sections[currentSection].stop();
+    currentSection = ArrangerSection::None;
+  }
+}

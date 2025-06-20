@@ -23,6 +23,8 @@ public:
     void setBPM(double newBPM);
     void setStretch(double newBPMOffset);
 
+    void stop();
+
 private:
   enum class ArrangerSection {
     Intro,
