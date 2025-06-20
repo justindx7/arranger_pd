@@ -91,3 +91,44 @@ void ArrangerLogic::initSections(SampleButton &intro, std::array<SampleButton, 4
         sections[section].prepare();
     }
 }
+void ArrangerLogic::prepareToPlay(double sampleRate, int bufferSize) {
+  mixer.removeAllInputs();
+  mixer.prepareToPlay(bufferSize, sampleRate);
+
+  for (auto &[section, info] : sections) {
+    if (info.player) {
+      info.player->prepareToPlay(sampleRate, bufferSize);
+      mixer.addInputSource(info.player->getSource(), false);
+    }
+  }
+}
+
+void ArrangerLogic::releaseSources() {
+  for (auto &[section, info] : sections) {
+    if (info.player)
+      info.player->releaseSources();
+  }
+}
+
+void ArrangerLogic::setBPM(double newBPM) {
+  constexpr double epsilon = 1e-6;
+  if (std::abs(BPM - newBPM) > epsilon) {
+    BPM = newBPM;
+    for (auto &[section, info] : sections) {
+      info.calculate();
+    }
+  }
+}
+
+void ArrangerLogic::setStretch(double newBPMOffset) {
+  constexpr double epsilon = 1e-6;
+  if (std::abs(bpmOffset - newBPMOffset) > epsilon) {
+    bpmOffset = newBPMOffset;
+
+    double speed = (BPM + bpmOffset) / BPM;
+
+    for (auto &[section, info] : sections) {
+      info.setSpeed(speed);
+    }
+  }
+}

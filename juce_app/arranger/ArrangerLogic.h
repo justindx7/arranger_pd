@@ -10,26 +10,9 @@ public:
     // Needs references to all button vectors
     void initSections(SampleButton &intro, std::array<SampleButton,4> &verses, std::array<SampleButton,4> &fillIns,SampleButton &outro);
 
-   // return function to getNextAudioBlock of all the players form the sections 
+    void prepareToPlay(double sampleRate, int bufferSize);
 
-    void prepareToPlay(double sampleRate, int bufferSize) {
-        mixer.removeAllInputs(); 
-        mixer.prepareToPlay(bufferSize, sampleRate); 
-
-        for (auto& [section, info] : sections) {
-            if(info.player) {
-                info.player->prepareToPlay(sampleRate, bufferSize);
-                mixer.addInputSource(info.player->getSource(), false);
-            }
-        }
-    }
-
-    void releaseSources() {
-        for (auto& [section, info] : sections) {
-            if(info.player)
-                info.player->releaseSources();
-        }
-    }
+    void releaseSources();
 
     void update();
 
@@ -37,29 +20,8 @@ public:
         return mixer;
     }
 
-    void setBPM(double newBPM) {
-      constexpr double epsilon = 1e-6;
-      if (std::abs(BPM - newBPM) > epsilon) {
-        BPM = newBPM;
-        for (auto &[section, info] : sections) {
-          info.calculate();
-        }
-      }
-    }
-
-
-    void setStretch(double newBPMOffset) {
-      constexpr double epsilon = 1e-6;
-      if (std::abs(bpmOffset   - newBPMOffset) > epsilon) {
-        bpmOffset  = newBPMOffset;
-        
-        double speed = (BPM + bpmOffset) / BPM;
-
-        for (auto &[section, info] : sections) {
-          info.setSpeed(speed);
-        }
-      }
-    }
+    void setBPM(double newBPM);
+    void setStretch(double newBPMOffset);
 
 private:
   enum class ArrangerSection {
