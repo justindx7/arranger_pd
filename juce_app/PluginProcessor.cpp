@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include <memory>
 
 //==============================================================================
 AudioPluginAudioProcessor::AudioPluginAudioProcessor()
@@ -27,7 +28,9 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
     presetManager = std::make_unique<PresetManager>(parameters);
 
-
+    for(int i = 0; i < samplePlayers.max_size(); i++) {
+        samplePlayers[i] = std::make_unique<AudioFileHandler>();
+    }
 
 }
 
@@ -109,12 +112,14 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 
     
-    testPlayer.prepareToPlay(sampleRate,samplesPerBlock);  
-    testPlayer2.prepareToPlay(sampleRate,samplesPerBlock);  
+
+
     arrangerLogic.prepareToPlay(sampleRate,samplesPerBlock);
 
-    arrangerLogic.getMixer().addInputSource(testPlayer.getSource(), false);
-    arrangerLogic.getMixer().addInputSource(testPlayer2.getSource(), false);
+    for(auto &player : samplePlayers) {
+        player->prepareToPlay(sampleRate,samplesPerBlock);
+        arrangerLogic.getMixer().addInputSource(player->getSource(), false);
+    }
 
     juce::dsp::ProcessSpec spec;
 
@@ -131,8 +136,10 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 void AudioPluginAudioProcessor::releaseResources()
 {
-    testPlayer.releaseSources();
-    testPlayer2.releaseSources();
+
+    for(auto &player : samplePlayers) {
+        player->releaseSources();
+    }
     arrangerLogic.releaseSources();
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.

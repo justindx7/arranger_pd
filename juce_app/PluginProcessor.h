@@ -5,6 +5,7 @@
 #include "arranger/ArrangerLogic.h"
 #include "service/PresetManager.h"
 #include <JuceHeader.h>
+#include <memory>
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor
@@ -47,16 +48,16 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     PresetManager& getPresetManager(){return *presetManager;}
+    std::array<std::unique_ptr<AudioFileHandler>,8>& getSamplePlayers() { return samplePlayers; }
 
-    AudioFileHandler testPlayer;
-    AudioFileHandler testPlayer2;
+    ArrangerLogic& getArrangerLogic(){return arrangerLogic;}
 
-    ArrangerLogic arrangerLogic;
 
   private:
     //==============================================================================
-     
+    std::array<std::unique_ptr<AudioFileHandler>,8> samplePlayers;     
 
+    ArrangerLogic arrangerLogic;
     std::unique_ptr<PresetManager> presetManager;
 
     MidiHandler midiHandler;
