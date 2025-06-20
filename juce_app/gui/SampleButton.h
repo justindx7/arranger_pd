@@ -68,7 +68,6 @@ protected:
     void paintButton(juce::Graphics&, bool isMouseOverButton, bool isButtonDown) override;
 
 private:
-    void valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) override;
     void valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child) override;
     void valueTreeChildRemoved(juce::ValueTree& parent, juce::ValueTree& child, int) override;
     //void valueTreeChildChanged(juce::ValueTree& parent, juce::ValueTree& child)

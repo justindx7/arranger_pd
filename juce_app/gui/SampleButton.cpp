@@ -1,5 +1,6 @@
 #include "SampleButton.h"
 #include "juce_core/system/juce_PlatformDefs.h"
+#include "juce_graphics/juce_graphics.h"
 
 SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference)
     : juce::TextButton(buttonText), APVTSRef(Reference)
@@ -8,6 +9,7 @@ SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorV
     originalButtonText = buttonText;
     setButtonText(originalButtonText);
     APVTSName = makeValidXmlName(originalButtonText) + "Path";
+    DBG(APVTSName);
 
     APVTSRef.state.addListener(this);
     APVTSRef.state.getOrCreateChildWithName(APVTSName, nullptr);
@@ -40,6 +42,14 @@ void SampleButton::mouseExit(const juce::MouseEvent& event)
 
 void SampleButton::setEditMode(bool shouldBeInEditMode) {
     editMode = shouldBeInEditMode;
+
+
+    if (editMode) {
+      startFlashing();
+    } else {
+      stopFlashing();
+    }
+    repaint();
 }
 
 bool SampleButton::isInEditMode() const {
@@ -131,14 +141,23 @@ bool SampleButton::getPlayingState() const {
 
 void SampleButton::saveState() {
     auto buttonNode = APVTSRef.state.getOrCreateChildWithName(APVTSName, nullptr);
+    if (!buttonNode.hasProperty("filePath"))
+        buttonNode.setProperty("filePath", "", nullptr);
+
     buttonNode.setProperty("filePath", selectedFilePath, nullptr);
+
 }
 
 void SampleButton::restoreState() {
     auto buttonNode = APVTSRef.state.getChildWithName(APVTSName);
+
+
     if (buttonNode.isValid())
     {
-        setFile(buttonNode["filePath"].toString());
+      if (!buttonNode.hasProperty("filePath"))
+        buttonNode.setProperty("filePath", "", nullptr);
+
+      setFile(buttonNode["filePath"].toString());
     }
 }
 
@@ -175,15 +194,18 @@ void SampleButton::timerCallback() {
 
 void SampleButton::startFlashing() {
     flashOn = false;
-    startTimer(300); // Flash every 300ms
+    if(isPlaying) {
+        startTimer(300); // Flash every 300ms
+    } else {
+
+        startTimer(500); 
+    }
 }
 
 void SampleButton::stopFlashing() {
     stopTimer();
     flashOn = false;
     repaint();
-}
-void SampleButton::valueTreePropertyChanged(juce::ValueTree& tree, const juce::Identifier& property) {
 }
 
 void SampleButton::valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child)
@@ -210,6 +232,11 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     // Overlay a white flash if playing and flashOn
     if (isPlaying && flashOn && selectedFilePath != "")
     {
+        g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.fillRect(getLocalBounds());
+    }
+
+    if (!isPlaying && editMode && flashOn ) {
         g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
