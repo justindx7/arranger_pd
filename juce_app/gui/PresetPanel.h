@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "../service/PresetManager.h"
 #include "MidiAssignComponent.h"
+#include "CategoryAssignComponent.h"
 
 class PresetPanel : public juce::Component
 {
@@ -35,4 +36,12 @@ private:
 
     void changePage(int delta);
     void openSaveDialog();
+    void openCategoryDialog(const juce::String& fileName);
+
+   juce::ComboBox categoryFilterBox;
+   juce::String filterCategory = "All";
+
+   const juce::StringArray presetCategories{
+       "Ballad", "Disco", "Hiphop", "House", "Orchestral",
+       "Pop",    "Latin", "Reggae", "Rock",  "Waltz"};
 };

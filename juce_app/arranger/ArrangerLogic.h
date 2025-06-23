@@ -23,6 +23,7 @@ public:
     }
 
     void setBPM(double newBPM);
+    double getBPM() {return BPM;}
     void setStretch(double newBPMOffset);
 
     void stop();

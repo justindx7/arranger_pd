@@ -113,12 +113,17 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     tempoLabel.setJustificationType(juce::Justification::centred);
     tempoLabel.setText("0 BPM", juce::dontSendNotification);
 
+
     // update the label when slider value changes
     tempoSlider.onValueChange = [this] {
         double tempo = tempoSlider.getValue();
-        tempoLabel.setText(juce::String(tempo, 1) + " BPM", juce::dontSendNotification);
+        double bpm = processorRef.getArrangerLogic().getBPM();
+        juce::String tempoStr = (tempo > 0 ? "+" : "") + juce::String(tempo, 1);
+        tempoLabel.setText(juce::String(bpm + tempo, 1) + " | " +
+                               tempoStr + " BPM",
+                           juce::dontSendNotification);
     };
-
+    tempoSlider.onValueChange();
 
     // Slider for Reverb
     addAndMakeVisible(reverbSlider);
@@ -149,12 +154,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     int height = static_cast<int>(screenBounds.getHeight() * 0.9);
     setSize(width, height);
     // Set the editor to be resizable
-    setResizable(true, true);
+    setResizable(true, false);
     // Enforce 16:9 aspect ratio constraint
     // Dynamically set the aspect ratio based on the screen's aspect ratio
     double screenAspectRatio = static_cast<double>(screenBounds.getWidth()) / static_cast<double>(screenBounds.getHeight());
     getConstrainer()->setFixedAspectRatio(screenAspectRatio);
-
+    
     processorRef.getMidiHandler().setRepaintCallback([this] {
       juce::MessageManager::callAsync([this] { this->repaint(); });
       if(presetPanel)
@@ -162,11 +167,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     });
 }
 
-AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
-{
+AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor() {
 
-    tempoSlider.setLookAndFeel(nullptr); 
-    reverbSlider.setLookAndFeel(nullptr);
+  tempoSlider.setLookAndFeel(nullptr);
+  reverbSlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -180,6 +184,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     juce::String currentPreset = processorRef.getPresetManager().getCurrentPreset();
     g.drawFittedText (currentPreset, getLocalBounds(), juce::Justification::topLeft, 1);
 
+    tempoSlider.onValueChange();
     //color for easy debugging
     // g.fillRect(tempoSlider.getBounds().toFloat().reduced(2.0f));
 

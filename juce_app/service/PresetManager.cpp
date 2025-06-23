@@ -8,10 +8,15 @@ const juce::File PresetManager::midiAssignFile{juce::File::getSpecialLocation(ju
         .getChildFile("songdata")
         .getChildFile("midi_assignments.settings")};
 
-
+const juce::File PresetManager::presetCategoryFile{
+    juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)
+        .getChildFile("songdata")
+        .getChildFile("preset_categories.settings")
+};
 
 PresetManager::PresetManager(juce::AudioProcessorValueTreeState &apvts): valueTreeState(apvts) {
   loadMidiAssignments();
+  loadPresetCategories();
 
   if (!defaultDirectory.exists()) {
     const auto makeDir = defaultDirectory.createDirectory();
@@ -60,6 +65,10 @@ void PresetManager::deletePreset(const juce::String &presetName) {
     return;
   }
   currentPreset.setValue("");
+  if (presetCategories.contains(presetName)) {
+    presetCategories.remove(presetName);
+    savePresetCategories();
+  }
 }
 
 void PresetManager::loadPreset(const juce::String &presetName) {
@@ -214,4 +223,48 @@ void PresetManager::loadMidiAssignments(){
       midiProgramToPreset.set(midiNum,key);
     }
   }
+}
+
+void PresetManager::savePresetCategories() {
+    juce::PropertiesFile::Options options;
+    options.applicationName = "Arranger";
+    options.filenameSuffix = "settings";
+    options.folderName = "";
+
+    juce::PropertiesFile props(presetCategoryFile, options);
+    auto keys = props.getAllProperties().getAllKeys();
+    for (const auto& key : keys)
+        props.removeValue(key);
+
+    for (auto it = presetCategories.begin(); it != presetCategories.end(); ++it)
+        props.setValue(it.getKey(), it.getValue());
+
+    props.saveIfNeeded();
+}
+
+void PresetManager::loadPresetCategories() {
+    juce::PropertiesFile::Options options;
+    options.applicationName = "Arranger";
+    options.filenameSuffix = "settings";
+    options.folderName = "";
+
+    juce::PropertiesFile props(presetCategoryFile, options);
+    presetCategories.clear();
+
+    auto keys = props.getAllProperties();
+    for (int i = 0; i < keys.size(); ++i) {
+        auto key = keys.getAllKeys()[i];
+        auto category = props.getValue(key, "");
+        if (category.isNotEmpty())
+            presetCategories.set(key, category);
+    }
+}
+
+void PresetManager::setPresetCategory(const juce::String& presetName, const juce::String& category) {
+    presetCategories.set(presetName, category);
+    savePresetCategories();
+}
+
+juce::String PresetManager::getPresetCategory(const juce::String& presetName) const {
+    return presetCategories[presetName];
 }

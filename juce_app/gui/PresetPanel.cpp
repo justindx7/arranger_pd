@@ -24,11 +24,32 @@ PresetPanel::PresetPanel(PresetManager& presetManager, std::function<void()> onC
     nextPageButton.onClick = [this] { changePage(1); };
 
     refreshPresetList();
+
+    addAndMakeVisible(categoryFilterBox);
+    categoryFilterBox.addItem("All", 1);
+    for (const auto &cat : presetCategories)
+      categoryFilterBox.addItem(cat, categoryFilterBox.getNumItems() + 1);
+
+    categoryFilterBox.setSelectedId(1);
+
+    categoryFilterBox.onChange = [this] {
+      filterCategory = categoryFilterBox.getText();
+      refreshPresetList();
+
+    };
 }
 
 void PresetPanel::refreshPresetList()
 {
-    presets = PresetManager::getAllPresets();
+    auto allPresets = manager.getAllPresets();
+
+    presets.clear();
+    for (const auto &preset : allPresets) {
+      auto cat = manager.getPresetCategory(preset);
+      if (filterCategory == "All" || cat == filterCategory)
+        presets.add(preset);
+    }
+
     totalPages = std::max(1, (int)std::ceil((float)presets.size() / (float)presetsPerPage));
     currentPage = std::min(currentPage, totalPages - 1);
     selectedPreset = manager.getCurrentPreset();
@@ -81,9 +102,17 @@ void PresetPanel::paint(juce::Graphics& g)
         juce::String displayText = presets[i];
         if (manager.getMidiProgramAssignments().contains(presets[i]))
         {
-            int midiNum = manager.getMidiProgramAssignments()[presets[i]];
-            displayText += "   [MIDI: " + juce::String(midiNum) + "]";
+          int midiNum = manager.getMidiProgramAssignments()[presets[i]];
+          displayText += "   [MIDI: " + juce::String(midiNum) + "]";
         }
+
+
+        if (categoryFilterBox.getText() == "All")
+        {
+            juce::String presetCategory = manager.getPresetCategory(presets[i]);
+          displayText += " | Category:  " + presetCategory;
+        }
+
         g.drawText(displayText, itemArea.reduced(20, 0), juce::Justification::centredLeft);
 
         // Draw delete button (centered vertically)
@@ -148,6 +177,8 @@ void PresetPanel::resized()
     saveButton.setBounds(20, 10, 160, btnH);
     prevPageButton.setBounds(20, getHeight() - 70, 60, 50);
     nextPageButton.setBounds(getWidth() - 80, getHeight() - 70, 60, 50);
+
+    categoryFilterBox.setBounds(getWidth()  - 340, 10, 160, btnH                     );
 }
 
 void PresetPanel::mouseUp(const juce::MouseEvent& e)
@@ -162,6 +193,7 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
         {
             manager.deletePreset(presetToDelete);
             manager.removeMidiProgram(presetToDelete);
+
             showDeletePopup = false;
             refreshPresetList();
             return;
@@ -264,8 +296,27 @@ void PresetPanel::openSaveDialog()
             auto userInput = saveAlertWindow->getTextEditorContents("text");
             auto fileName = juce::File::createLegalFileName(userInput);
             manager.savePreset(fileName);
+            openCategoryDialog(fileName);
             refreshPresetList();
         }
     });
     saveAlertWindow->enterModalState(true, callback, false);
+}
+
+void PresetPanel::openCategoryDialog(const juce::String& fileName) {
+
+  auto *comp = new CategoryAssignComponent(
+      presetCategories, [this, fileName](const juce::String &category) {
+        manager.setPresetCategory(fileName, category);
+        refreshPresetList();
+      });
+
+  juce::DialogWindow::LaunchOptions opts;
+  opts.content.setOwned(comp);
+  opts.dialogTitle = "Select Category";
+  opts.dialogBackgroundColour = juce::Colours::darkgrey;
+  opts.escapeKeyTriggersCloseButton = true;
+  opts.useNativeTitleBar = false;
+  opts.resizable = false;
+  opts.launchAsync();
 }
