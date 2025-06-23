@@ -118,6 +118,7 @@ void SampleButton::clicked()
 
         if(isArranger && !isPlaying) {
             setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+            repaint();
         }
     }
 }
@@ -131,6 +132,7 @@ juce::String SampleButton::getSelectedFilePath() const {
 }
 
 void SampleButton::setPlayingState(bool playing) {
+
   if (isPlaying != playing && selectedFilePath != "") {
     isPlaying = playing;
 
@@ -220,7 +222,9 @@ void SampleButton::startFlashing() {
 void SampleButton::stopFlashing() {
     stopTimer();
     flashOn = false;
-    setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+
+    if(isArranger)
+        setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
 
     repaint();
 }

@@ -13,6 +13,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(showPresetPanelButton);
     showPresetPanelButton.onClick = [this] () {showPresetPanel();};
 
+    addAndMakeVisible(showOptionsPanelButton);
+    showOptionsPanelButton.onClick = [this] () {showOptionsPanel();};
 
     //Sample buttons
     for (int i = 0; i < sampleButtons.size(); ++i) {
@@ -171,8 +173,9 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
     g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Arranger", getLocalBounds(), juce::Justification::topLeft, 1);
+    g.setFont (20.0f);
+    juce::String currentPreset = processorRef.getPresetManager().getCurrentPreset();
+    g.drawFittedText (currentPreset, getLocalBounds(), juce::Justification::topLeft, 1);
 
     //color for easy debugging
     // g.fillRect(tempoSlider.getBounds().toFloat().reduced(2.0f));
@@ -183,19 +186,6 @@ void AudioPluginAudioProcessorEditor::resized()
 {
 
     // Calculate the height of the "Arranger" text
-    int titleFontHeight = 15;
-    int titleMargin = 10;
-
-    // Draw the "Arranger" text at the top left
-    juce::Rectangle<int> titleBounds(10, 10, 200, titleFontHeight + 4);
-
-    // Place the showPresetPanelButton below the "Arranger" text
-
-    int buttonX = titleBounds.getX();
-    int buttonY = titleBounds.getBottom() + titleMargin;
-    showPresetPanelButton.setBounds(buttonX, buttonY, 100, 60);
-
-
     // Define individual spacings for each group
 
     const int fillSpacing = 30;
@@ -222,8 +212,20 @@ void AudioPluginAudioProcessorEditor::resized()
 
     int buttonWidth = buttonSize;
     int buttonHeight = buttonSize;
+    int halfButtonSize = buttonSize / 2;
 
     auto sampleArea = getLocalBounds().removeFromTop(numRows * (buttonHeight + 2 * margin));
+
+
+    int titleFontHeight = 15;
+    int titleMargin = 10;
+    juce::Rectangle<int> titleBounds(10, 10, 200, titleFontHeight + 4);
+    // Place the showPresetPanelButton below the "Arranger" text
+    int buttonX = titleBounds.getX();
+    int buttonY = titleBounds.getBottom() + titleMargin;
+    showPresetPanelButton.setBounds(buttonX, buttonY, buttonSize, halfButtonSize);
+    showOptionsPanelButton.setBounds(buttonX, buttonY + halfButtonSize +  titleMargin, buttonSize, halfButtonSize);
+
 
     for (int row = 0; row < numRows; ++row)
     {

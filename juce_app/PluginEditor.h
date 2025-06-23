@@ -4,6 +4,7 @@
 #include <array>
 #include <memory>
 #include "arranger/ArrangerLogic.h"
+#include "gui/OptionsPanel.h"
 #include "gui/SampleButton.h"
 #include "gui/PresetPanel.h"
 #include "gui/SliderLookAndFeel.h"
@@ -77,15 +78,26 @@ private: // This reference is provided as a quick way for your editor to access 
     std::unique_ptr<SliderAttachment> stretchAttachment;
 
     juce::Slider reverbSlider;
-
+    
     juce::Label tempoLabel { "Tempo", "Tempo" };
     SliderLookAndFeel sliderLookAndFeel;
-
     bool isEditMode = false;
-
     juce::Label reverbLabel { "Reverb", "Reverb" };
 
 
+
+    juce::TextButton showOptionsPanelButton{"Options"};
+    std::unique_ptr<OptionsPanel> optionsPanel;
+
+    void showOptionsPanel() {
+      optionsPanel = std::make_unique<OptionsPanel>(Reference, [this] {
+        optionsPanel.reset();
+        // Optionally repaint or update UI
+      });
+      addAndMakeVisible(*optionsPanel);
+      optionsPanel->setBounds(getLocalBounds());
+      optionsPanel->toFront(true);
+    }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };
