@@ -14,8 +14,12 @@
             << (presetName.isNotEmpty() ? presetName : "<none>")
             << " at sample " << samplePosition);
 
-        juce::MessageManager::callAsync([presetManagerPtr = &manager, presetName]() {
-        presetManagerPtr->loadPreset(presetName);
+        juce::MessageManager::callAsync([presetManagerPtr = &manager, presetName, this]() {
+          presetManagerPtr->loadPreset(presetName);
+
+          if(repaintCallback)
+            repaintCallback();
+
         });
 
       }else if (msg.isNoteOn()) {

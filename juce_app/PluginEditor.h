@@ -86,7 +86,7 @@ private: // This reference is provided as a quick way for your editor to access 
 
 
 
-    juce::TextButton showOptionsPanelButton{"Options"};
+    juce::TextButton showOptionsPanelButton{"Settings"};
     std::unique_ptr<OptionsPanel> optionsPanel;
 
     void showOptionsPanel() {

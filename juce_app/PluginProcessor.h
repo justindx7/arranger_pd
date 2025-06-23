@@ -51,6 +51,7 @@ public:
     std::array<std::unique_ptr<AudioFileHandler>,8>& getSamplePlayers() { return samplePlayers; }
 
     ArrangerLogic& getArrangerLogic(){return arrangerLogic;}
+    MidiHandler& getMidiHandler(){return midiHandler;}
 
 
   private:

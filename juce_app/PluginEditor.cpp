@@ -40,12 +40,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
        };
     }
 
-    int fillNumber = 1;
     for (auto &button : fillsButtons) {
         addAndMakeVisible(button);
     }
 
-    int verseNumber = 1;
     for (auto &button : verseButtons) {
         addAndMakeVisible(button);
     }
@@ -156,7 +154,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Dynamically set the aspect ratio based on the screen's aspect ratio
     double screenAspectRatio = static_cast<double>(screenBounds.getWidth()) / static_cast<double>(screenBounds.getHeight());
     getConstrainer()->setFixedAspectRatio(screenAspectRatio);
-    
+
+    processorRef.getMidiHandler().setRepaintCallback([this] {
+      juce::MessageManager::callAsync([this] { this->repaint(); });
+      if(presetPanel)
+        presetPanel->refreshPresetList();
+    });
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
