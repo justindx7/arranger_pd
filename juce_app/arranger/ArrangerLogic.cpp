@@ -43,7 +43,7 @@ void ArrangerLogic::update() {
         }
 
         // Use a tolerance to check if pos is close to any bar location
-        constexpr double toleranceMs = 4.0; // 10 milliseconds tolerance
+        constexpr double toleranceMs = 2.0; // 10 milliseconds tolerance
         bool found = false;
         for (const auto& barLoc : cur.barLocations) {
             if (std::abs(barLoc - pos) <= toleranceMs) {
@@ -137,5 +137,40 @@ void ArrangerLogic::stop() {
   if (currentSection != ArrangerSection::None) {
     sections[currentSection].stop();
     currentSection = ArrangerSection::None;
+  }
+  if (introPtr) {
+    juce::MessageManager::callAsync([buttonPtr = introPtr] {
+      if (buttonPtr)
+        buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+      buttonPtr->repaint();
+    });
+  }
+
+  if (versesPtr) {
+    for (auto& button : *versesPtr) {
+      juce::MessageManager::callAsync([buttonPtr = &button] {
+        if (buttonPtr)
+          buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+        buttonPtr->repaint();
+      });
+    }
+  }
+
+  if (fillInsPtr) {
+    for (auto& button : *fillInsPtr) {
+      juce::MessageManager::callAsync([buttonPtr = &button] {
+        if (buttonPtr)
+          buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+        buttonPtr->repaint();
+      });
+    }
+  }
+
+  if (outroPtr) {
+    juce::MessageManager::callAsync([buttonPtr = outroPtr] {
+      if (buttonPtr)
+        buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+      buttonPtr->repaint();
+    });
   }
 }

@@ -74,16 +74,19 @@ private:
     }
 
     void calculate() {
+      barLocations.clear(); // Clear previous bar locations
+      if (arrangerLogic) {
         double beatLengthMS = 60000 / arrangerLogic->BPM;
         double barLengthMS = 4 * beatLengthMS;
-        double bars =(player->getSampleLengthInSec() * 1000) / barLengthMS;
+        double bars = (player->getSampleLengthInSec() * 1000) / barLengthMS;
         barAmount = bars;
-        DBG("Amount of Bars for: "<<arrangerLogic->BPM<<"BPM: " << bars);
 
-        for(int i = 1; i < bars; i++) {
-            barLocations.insert(barLengthMS * i);            
+        DBG("Amount of Bars for: " << arrangerLogic->BPM << "BPM: " << bars);
+
+        for (int i = 1; i < bars; i++) {
+          barLocations.insert(barLengthMS * i);
         }
-
+      }
     }
 
     void play() {
