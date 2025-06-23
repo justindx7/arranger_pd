@@ -127,10 +127,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     // Slider for Reverb
     addAndMakeVisible(reverbSlider);
+    reverbAttachment = std::make_unique<SliderAttachment>(Reference, "uDryWet", reverbSlider);
     reverbSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     reverbSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, false, 0, 0);
-    reverbSlider.setRange(0.0, 100.0, 0.1);
-    reverbSlider.setValue(0.0); // Default value at 50%
     reverbSlider.setTextValueSuffix("%");
     // Set the look and feel for the reverb slider
     reverbSlider.setLookAndFeel(&sliderLookAndFeel); // Set custom look and feel for the slider

@@ -18,4 +18,17 @@ private:
     juce::TextButton bpmMinusButton { "-" };
     juce::TextButton bpmPlusButton { "+" };
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bpmAttachment;
+
+    // --- Added for Room Size, Damping, Width ---
+    juce::Slider roomSizeSlider;
+    juce::Label roomSizeLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomSizeAttachment;
+
+    juce::Slider dampingSlider;
+    juce::Label dampingLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampingAttachment;
+
+    juce::Slider widthSlider;
+    juce::Label widthLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
 };

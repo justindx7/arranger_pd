@@ -78,6 +78,7 @@ private: // This reference is provided as a quick way for your editor to access 
     std::unique_ptr<SliderAttachment> stretchAttachment;
 
     juce::Slider reverbSlider;
+    std::unique_ptr<SliderAttachment> reverbAttachment;
     
     juce::Label tempoLabel { "Tempo", "Tempo" };
     SliderLookAndFeel sliderLookAndFeel;

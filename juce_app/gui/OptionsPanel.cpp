@@ -10,7 +10,6 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     bpmLabel.setText("BPM", juce::dontSendNotification);
     addAndMakeVisible(bpmLabel);
 
-    bpmSlider.setRange(40.0, 300.0, 1.0);
     bpmSlider.setTextValueSuffix(" BPM");
     bpmSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     addAndMakeVisible(bpmSlider);
@@ -35,6 +34,30 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     bpmSlider.onValueChange = [this] {
         bpmValueLabel.setText(juce::String((int)bpmSlider.getValue()), juce::dontSendNotification);
     };
+
+    // --- Room Size Slider ---
+    roomSizeLabel.setText("Room Size", juce::dontSendNotification);
+    addAndMakeVisible(roomSizeLabel);
+    roomSizeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    addAndMakeVisible(roomSizeSlider);
+    roomSizeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        Reference, "uRoomSize", roomSizeSlider);
+
+    // --- Damping Slider ---
+    dampingLabel.setText("Damping", juce::dontSendNotification);
+    addAndMakeVisible(dampingLabel);
+    dampingSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    addAndMakeVisible(dampingSlider);
+    dampingAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        Reference, "uDamping", dampingSlider);
+
+    // --- Width Slider ---
+    widthLabel.setText("Width", juce::dontSendNotification);
+    addAndMakeVisible(widthLabel);
+    widthSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    addAndMakeVisible(widthSlider);
+    widthAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        Reference, "uWidth", widthSlider);
 }
 
 void OptionsPanel::paint(juce::Graphics& g) {
@@ -52,6 +75,17 @@ void OptionsPanel::resized() {
     bpmValueLabel.setBounds(40 + w, y, w, h);
     bpmPlusButton.setBounds(40 + 2*w, y, w, h);
     bpmSlider.setBounds(40, y + h + 10, getWidth() - 80, 40);
-    closeButton.setBounds(getWidth() - 120, 10, 100, 50);
 
+    int sliderY = y + h + 60;
+    int sliderH = 40;
+    roomSizeLabel.setBounds(40, sliderY, 120, 30);
+    roomSizeSlider.setBounds(160, sliderY, getWidth() - 200, sliderH);
+
+    dampingLabel.setBounds(40, sliderY + 50, 120, 30);
+    dampingSlider.setBounds(160, sliderY + 50, getWidth() - 200, sliderH);
+
+    widthLabel.setBounds(40, sliderY + 100, 120, 30);
+    widthSlider.setBounds(160, sliderY + 100, getWidth() - 200, sliderH);
+
+    closeButton.setBounds(getWidth() - 120, 10, 100, 50);
 }

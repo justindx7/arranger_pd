@@ -21,9 +21,16 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     }
 
     parameters.replaceState(juce::ValueTree("Parameters"));
+
     bpmParameter = parameters.getRawParameterValue("uBPM");
     stretchParameter = parameters.getRawParameterValue("uStretch");              
 
+    dryWetParameter = parameters.getRawParameterValue("uDryWet"); 
+
+    roomSizeParameter = parameters.getRawParameterValue("uRoomSize"); 
+    dampingParameter = parameters.getRawParameterValue("uDamping");
+    widthParameter = parameters.getRawParameterValue("uWidth");
+ 
     parameters.state.setProperty(PresetManager::presetNameProperty, "", nullptr);
     parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
     presetManager = std::make_unique<PresetManager>(parameters);
@@ -109,11 +116,6 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-
-
-    
-
-
     arrangerLogic.prepareToPlay(sampleRate,samplesPerBlock);
 
     for(auto &player : samplePlayers) {
@@ -132,7 +134,18 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     limiter.setThreshold(-0.1f); // dB
     limiter.setRelease(50.0f);   // ms
 
+
+    reverb.prepare(spec);
+
+    wetFilter.prepare(spec);
+    wetFilter.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
+    wetFilter.setCutoffFrequency(8000.0f); // Darken the wet signal
+    //wetFilter.setResonance(0.7f);
+
+    wetBuffer.setSize(spec.numChannels, samplesPerBlock);
+    dryBuffer.setSize(spec.numChannels, samplesPerBlock);
 }
+
 
 void AudioPluginAudioProcessor::releaseResources()
 {
@@ -191,6 +204,51 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     arrangerLogic.setStretch(stretchParameter->load());
     arrangerLogic.update();
     arrangerLogic.getMixer().getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
+
+    wetMix = (dryWetParameter->load()/100);
+    dryMix = 1 - (dryWetParameter->load()/100);
+
+    // Initialize reverb parameters
+    reverbParams.roomSize = (roomSizeParameter->load() / 100);
+    reverbParams.damping = (dampingParameter->load() / 100);
+    reverbParams.width = (widthParameter->load() / 100);
+
+    reverbParams.freezeMode = 0.0f;
+
+    reverb.setParameters(reverbParams);
+
+    auto numSamples = buffer.getNumSamples();
+    // Store dry signal
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+      dryBuffer.copyFrom(channel, 0, buffer, channel, 0, numSamples);
+    }
+
+    // Create wet signal by copying input and processing with reverb
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+      wetBuffer.copyFrom(channel, 0, buffer, channel, 0, numSamples);
+    }
+
+    // Process wet signal through reverb
+    // Note: We temporarily set dry level to 0 to get only wet signal
+
+    juce::dsp::AudioBlock<float> wetBlock(wetBuffer);
+    juce::dsp::ProcessContextReplacing<float> wetContext(wetBlock);
+    reverb.process(wetContext);
+
+    // Apply filtering to wet signal only
+    wetFilter.process(wetContext);
+
+    // Mix dry and processed wet signals
+    for (int channel = 0; channel < totalNumInputChannels; ++channel) {
+      auto *channelData = buffer.getWritePointer(channel);
+      auto *dryData = dryBuffer.getReadPointer(channel);
+      auto *wetData = wetBuffer.getReadPointer(channel);
+
+      for (int sample = 0; sample < numSamples; ++sample) {
+        channelData[sample] =
+            (dryData[sample] * dryMix) + (wetData[sample] * wetMix);
+      }
+    }
 
     // Limiter
     juce::dsp::AudioBlock<float> audioBlock(buffer);
