@@ -117,8 +117,8 @@ void SampleButton::clicked()
             onNormalClick();
 
         if(isArranger && !isPlaying) {
-            setColour(juce::TextButton::buttonColourId, juce::Colours::green);
-            repaint();
+            //setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+            //repaint();
         }
     }
 }
@@ -205,17 +205,17 @@ void SampleButton::timerCallback() {
 
 void SampleButton::startFlashing() {
     flashOn = false;
-    if(isArranger && isPlaying) {
-       // GET BPM 
-        float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
-        int ms = (60000.f / BPM);
-        startTimer(ms);
+    if (isArranger && isPlaying) {
+      // GET BPM
+      float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
+      int ms = (60000.f / BPM);
+      startTimer(ms);
 
-    } else if(isPlaying) {
-        startTimer(300); // Flash every 300ms
+    } else if (isPlaying) {
+      startTimer(300); // Flash every 300ms
     } else {
 
-        startTimer(500); 
+      startTimer(500);
     }
 }
 

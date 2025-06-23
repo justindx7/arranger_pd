@@ -3,6 +3,7 @@
 #include "../handlers/AudioFileHandler.h"
 #include "../gui/SampleButton.h"
 #include "juce_core/system/juce_PlatformDefs.h"
+#include "juce_graphics/juce_graphics.h"
 
 class ArrangerLogic {
 public:
@@ -13,6 +14,7 @@ public:
     void prepareToPlay(double sampleRate, int bufferSize);
 
     void releaseSources();
+    void handleColours();
 
     void update();
 
@@ -90,9 +92,7 @@ private:
     }
 
     void play() {
-
     if (sampleButton->getSelectedFilePath() != "") {
-      
     arrangerLogic->currentSection = thisSection;
     arrangerLogic->nextSection = nextSection;
     isPlaying = true;
@@ -101,6 +101,7 @@ private:
     juce::MessageManager::callAsync([buttonPtr = sampleButton] {
             if (buttonPtr)
                 buttonPtr->setPlayingState(true);
+                buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
             });
 
         } else {
@@ -128,21 +129,19 @@ private:
             player->shouldloadOnStop(!isLoop);
     
             sampleButton->onNormalClick = [&]() {
-
+                arrangerLogic->handleColours();
 
               if (arrangerLogic->currentSection == ArrangerSection::None) {
                   play();
               } else {
                 arrangerLogic->nextSection = thisSection;
                 arrangerLogic->sectionChangePending = true;
-
+                sampleButton->setColour(juce::TextButton::buttonColourId, juce::Colours::green);
               }
             };
-
             player->onSampleStopped = [&]() { 
                 isPlaying = false; 
                 sampleButton->setPlayingState(false);
-
               if (arrangerLogic->sectionChangePending) {
                 arrangerLogic->handleSectionEnd(arrangerLogic->nextSection);
                 arrangerLogic->sectionChangePending = false;

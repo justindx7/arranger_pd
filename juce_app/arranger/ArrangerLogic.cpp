@@ -138,39 +138,22 @@ void ArrangerLogic::stop() {
     sections[currentSection].stop();
     currentSection = ArrangerSection::None;
   }
-  if (introPtr) {
-    juce::MessageManager::callAsync([buttonPtr = introPtr] {
-      if (buttonPtr)
-        buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
-      buttonPtr->repaint();
-    });
-  }
 
-  if (versesPtr) {
-    for (auto& button : *versesPtr) {
-      juce::MessageManager::callAsync([buttonPtr = &button] {
+  for (auto &[section, info] : sections) {
+    if (info.sampleButton) {
+      juce::MessageManager::callAsync([buttonPtr = info.sampleButton] {
         if (buttonPtr)
-          buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
-        buttonPtr->repaint();
+        buttonPtr->setColour(juce::TextButton::buttonColourId,
+                             juce::Colours::darkblue);
       });
     }
   }
+}
 
-  if (fillInsPtr) {
-    for (auto& button : *fillInsPtr) {
-      juce::MessageManager::callAsync([buttonPtr = &button] {
-        if (buttonPtr)
-          buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
-        buttonPtr->repaint();
-      });
+void ArrangerLogic::handleColours() {
+  for (auto &[section, info] : sections) {
+    if (info.sampleButton) {
+        info.sampleButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
     }
-  }
-
-  if (outroPtr) {
-    juce::MessageManager::callAsync([buttonPtr = outroPtr] {
-      if (buttonPtr)
-        buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
-      buttonPtr->repaint();
-    });
   }
 }
