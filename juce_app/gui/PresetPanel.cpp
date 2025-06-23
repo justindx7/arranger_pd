@@ -105,12 +105,14 @@ void PresetPanel::paint(juce::Graphics& g)
           int midiNum = manager.getMidiProgramAssignments()[presets[i]];
           displayText += "   [MIDI: " + juce::String(midiNum) + "]";
         }
-
+        
 
         if (categoryFilterBox.getText() == "All")
         {
-            juce::String presetCategory = manager.getPresetCategory(presets[i]);
-          displayText += " | Category:  " + presetCategory;
+          juce::String presetCategory = manager.getPresetCategory(presets[i]);
+          if (presetCategory != "") {
+            displayText += "   | " + presetCategory;
+          }
         }
 
         g.drawText(displayText, itemArea.reduced(20, 0), juce::Justification::centredLeft);
