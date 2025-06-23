@@ -2,10 +2,11 @@
 #include "juce_core/system/juce_PlatformDefs.h"
 #include "juce_graphics/juce_graphics.h"
 
-SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference)
-    : juce::TextButton(buttonText), APVTSRef(Reference)
+SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference, bool isArrangeButton)
+    : juce::TextButton(buttonText), APVTSRef(Reference), isArranger(isArrangeButton)
 {
          
+
     originalButtonText = buttonText;
     setButtonText(originalButtonText);
     APVTSName = makeValidXmlName(originalButtonText) + "Path";
@@ -14,6 +15,9 @@ SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorV
     APVTSRef.state.addListener(this);
     APVTSRef.state.getOrCreateChildWithName(APVTSName, nullptr);
     restoreState();
+
+    if(isArranger) 
+        setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
 
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
@@ -111,6 +115,10 @@ void SampleButton::clicked()
     {
         if (onNormalClick)
             onNormalClick();
+
+        if(isArranger && !isPlaying) {
+            setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+        }
     }
 }
 
@@ -168,7 +176,8 @@ if(selectedFilePath != newFile) {
 
         if (selectedFile.existsAsFile()) {
             selectedFilePath = newFile;
-            setButtonText(selectedFile.getFileName());
+            if(!isArranger)
+                setButtonText(selectedFile.getFileName());
             saveState();
         }
 
@@ -194,7 +203,13 @@ void SampleButton::timerCallback() {
 
 void SampleButton::startFlashing() {
     flashOn = false;
-    if(isPlaying) {
+    if(isArranger && isPlaying) {
+       // GET BPM 
+        float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
+        int ms = (60000.f / BPM);
+        startTimer(ms);
+
+    } else if(isPlaying) {
         startTimer(300); // Flash every 300ms
     } else {
 
@@ -205,6 +220,8 @@ void SampleButton::startFlashing() {
 void SampleButton::stopFlashing() {
     stopTimer();
     flashOn = false;
+    setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+
     repaint();
 }
 
@@ -231,6 +248,12 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
 
     // Overlay a white flash if playing and flashOn
     if (isPlaying && flashOn && selectedFilePath != "")
+    {
+        g.setColour(juce::Colours::blue.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.fillRect(getLocalBounds());
+    }
+
+    if (isPlaying && flashOn && selectedFilePath != "" && isArranger)
     {
         g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());

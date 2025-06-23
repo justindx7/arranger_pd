@@ -35,19 +35,19 @@ private: // This reference is provided as a quick way for your editor to access 
 
     juce::ToggleButton editModeButton;
 
-    SampleButton introButton {"Intro",  Reference};
+    SampleButton introButton {"Intro",  Reference,true};
 
     std::array<SampleButton, 4> verseButtons{
-        SampleButton{"Verse 1", Reference}, SampleButton{"Verse 2", Reference},
-        SampleButton{"Verse 3", Reference}, SampleButton{"Verse 4", Reference}};
+        SampleButton{"Verse 1", Reference, true}, SampleButton{"Verse 2", Reference, true},
+        SampleButton{"Verse 3", Reference, true}, SampleButton{"Verse 4", Reference , true}};
 
     std::array<SampleButton, 4> fillsButtons{
-        SampleButton{"Fill-In 1", Reference},
-        SampleButton{"Fill-In 2", Reference},
-        SampleButton{"Fill-In 3", Reference},
-        SampleButton{"Fill-In 4", Reference}};
+        SampleButton{"Fill-In 1", Reference,true},
+        SampleButton{"Fill-In 2", Reference,true},
+        SampleButton{"Fill-In 3", Reference,true},
+        SampleButton{"Fill-In 4", Reference,true}};
 
-    SampleButton outroButton{"Outro", Reference};
+    SampleButton outroButton{"Outro", Reference, true};
 
     std::array<SampleButton, 8> sampleButtons{
         SampleButton{"Sample 1", Reference}, SampleButton{"Sample 2", Reference},

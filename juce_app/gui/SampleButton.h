@@ -39,7 +39,7 @@ private:
 
 class SampleButton : public juce::TextButton,public juce::ValueTree::Listener, private juce::Timer {
 public:
-    SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference);
+    SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference, bool isArrangeButton = false);
     ~SampleButton () override;
 
     void mouseEnter(const juce::MouseEvent& event) override;
@@ -82,6 +82,8 @@ private:
     std::unique_ptr<juce::FileChooser> fileChooser;
     bool editMode = false;
     bool isPlaying = false;
+
+    bool isArranger;
 
     bool flashOn = false;
     void timerCallback() override;
