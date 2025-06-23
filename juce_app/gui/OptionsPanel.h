@@ -31,4 +31,9 @@ private:
     juce::Slider widthSlider;
     juce::Label widthLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
+
+    // --- Highpass Frequency Slider ---
+    juce::Slider highpassSlider;
+    juce::Label highpassLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> highpassAttachment;
 };

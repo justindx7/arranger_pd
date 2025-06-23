@@ -30,7 +30,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     roomSizeParameter = parameters.getRawParameterValue("uRoomSize"); 
     dampingParameter = parameters.getRawParameterValue("uDamping");
     widthParameter = parameters.getRawParameterValue("uWidth");
- 
+    highpassFreqParameter = parameters.getRawParameterValue("uHighpassFreq");
+
     parameters.state.setProperty(PresetManager::presetNameProperty, "", nullptr);
     parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
     presetManager = std::make_unique<PresetManager>(parameters);
@@ -137,10 +138,9 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     reverb.prepare(spec);
 
-    wetFilter.prepare(spec);
-    wetFilter.setType(juce::dsp::StateVariableTPTFilterType::lowpass);
-    wetFilter.setCutoffFrequency(8000.0f); // Darken the wet signal
-    //wetFilter.setResonance(0.7f);
+    highPass.prepare(spec);
+    highPass.setType(juce::dsp::StateVariableTPTFilterType::highpass);
+    highPass.setCutoffFrequency(highpassFreqParameter->load()); 
 
     wetBuffer.setSize(spec.numChannels, samplesPerBlock);
     dryBuffer.setSize(spec.numChannels, samplesPerBlock);
@@ -205,6 +205,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     arrangerLogic.update();
     arrangerLogic.getMixer().getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
 
+    highPass.setCutoffFrequency(highpassFreqParameter->load()); 
+
     wetMix = (dryWetParameter->load()/100);
     dryMix = 1 - (dryWetParameter->load()/100);
 
@@ -236,7 +238,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     reverb.process(wetContext);
 
     // Apply filtering to wet signal only
-    wetFilter.process(wetContext);
+    highPass.process(wetContext);
 
     // Mix dry and processed wet signals
     for (int channel = 0; channel < totalNumInputChannels; ++channel) {
@@ -290,8 +292,7 @@ void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData
     copyXmlToBinary (*xml, destData);
 }
 
-void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
+void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes){
     std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary(data, sizeInBytes));
     
     if(xmlState.get() != nullptr)
@@ -301,7 +302,6 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 
 //==============================================================================
 // This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new AudioPluginAudioProcessor();
+juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter() {
+  return new AudioPluginAudioProcessor();
 }

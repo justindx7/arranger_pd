@@ -58,6 +58,16 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     addAndMakeVisible(widthSlider);
     widthAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         Reference, "uWidth", widthSlider);
+
+    // --- Highpass Frequency Slider ---
+    highpassLabel.setText("Highpass (Hz)", juce::dontSendNotification);
+    addAndMakeVisible(highpassLabel);
+    highpassSlider.setRange(20.0, 2000.0, 1.0);
+    highpassSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    highpassSlider.setTextValueSuffix(" Hz");
+    addAndMakeVisible(highpassSlider);
+    highpassAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        Reference, "uHighpassFreq", highpassSlider);
 }
 
 void OptionsPanel::paint(juce::Graphics& g) {
@@ -86,6 +96,9 @@ void OptionsPanel::resized() {
 
     widthLabel.setBounds(40, sliderY + 100, 120, 30);
     widthSlider.setBounds(160, sliderY + 100, getWidth() - 200, sliderH);
+
+    highpassLabel.setBounds(40, sliderY + 150, 120, 30);
+    highpassSlider.setBounds(160, sliderY + 150, getWidth() - 200, sliderH);
 
     closeButton.setBounds(getWidth() - 120, 10, 100, 50);
 }

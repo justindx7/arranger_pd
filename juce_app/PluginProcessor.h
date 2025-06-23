@@ -65,7 +65,7 @@ public:
     
     juce::AudioProcessorValueTreeState parameters;
 
-    static constexpr int numParameters = 6;
+    static constexpr int numParameters = 7; 
 
     std::atomic<float>* bpmParameter = nullptr;
     std::atomic<float>* stretchParameter = nullptr;
@@ -74,6 +74,7 @@ public:
     std::atomic<float>* roomSizeParameter = nullptr;
     std::atomic<float>* dampingParameter = nullptr;
     std::atomic<float>* widthParameter = nullptr;
+    std::atomic<float>* highpassFreqParameter = nullptr; 
 
     juce::NormalisableRange<float> bpmRange = {20.0f, 200.0f, 1.0f};
     juce::NormalisableRange<float> stretchRange = {-10.0f, 10.0f, 1.0f};
@@ -81,15 +82,16 @@ public:
     juce::NormalisableRange<float> roomSizeRange = {0.0f, 100.0f, 1.0f};
     juce::NormalisableRange<float> dampingRange = {0.0f, 100.0f, 1.0f};
     juce::NormalisableRange<float> widthRange = {0.0f, 100.0f, 1.0f};
+    juce::NormalisableRange<float> highpassFreqRange = {20.0f, 20000.0f, 1.0f}; 
 
-    float startingValues[numParameters] = {100.f, 0.f, 0.f, 50.f, 50.0f, 100.0f};
+    float startingValues[numParameters] = {100.f, 0.f, 0.f, 50.f, 50.0f, 100.0f, 20.0f};
 
     juce::NormalisableRange<float> normalisableRanges[numParameters] = {
-      bpmRange, stretchRange, drywetRange, roomSizeRange, dampingRange, widthRange
+      bpmRange, stretchRange, drywetRange, roomSizeRange, dampingRange, widthRange, highpassFreqRange 
     };
 
     std::string parameterNames[numParameters] = {
-      "BPM", "Stretch", "Reverb", "RoomSize", "Damping", "Width"
+      "BPM", "Stretch", "Reverb", "RoomSize", "Damping", "Width", "HighpassFreq" 
     };
 
     juce::ParameterID bpmParam{"uBPM", 1};
@@ -98,15 +100,20 @@ public:
     juce::ParameterID roomSizeParam{"uRoomSize", 1};
     juce::ParameterID dampingParam{"uDamping", 1};
     juce::ParameterID widthParam{"uWidth", 1};
+    juce::ParameterID highpassFreqParam{"uHighpassFreq", 1}; 
 
     juce::ParameterID parameterIDs[numParameters] = {
-      bpmParam, stretchParam, drywetParam, roomSizeParam, dampingParam, widthParam
+      bpmParam, stretchParam, drywetParam, roomSizeParam, dampingParam, widthParam, highpassFreqParam 
     };
 
     juce::dsp::Reverb reverb;
     juce::dsp::Reverb::Parameters reverbParams;
-    juce::dsp::StateVariableTPTFilter<float> wetFilter;
+
+    juce::dsp::StateVariableTPTFilter<float> lowShelfFilter;
+    juce::dsp::StateVariableTPTFilter<float> peakingFilter;
+    juce::dsp::StateVariableTPTFilter<float> highPass;
     
+
     // Temporary buffers for wet/dry separation
     juce::AudioBuffer<float> wetBuffer;
     juce::AudioBuffer<float> dryBuffer;
