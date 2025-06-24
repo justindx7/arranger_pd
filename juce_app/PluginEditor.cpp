@@ -156,8 +156,9 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     setResizable(true, false);
     // Enforce 16:9 aspect ratio constraint
     // Dynamically set the aspect ratio based on the screen's aspect ratio
-    double screenAspectRatio = static_cast<double>(screenBounds.getWidth()) / static_cast<double>(screenBounds.getHeight());
-    getConstrainer()->setFixedAspectRatio(screenAspectRatio);
+    //
+    //double screenAspectRatio = static_cast<double>(screenBounds.getWidth()) / static_cast<double>(screenBounds.getHeight());
+    //getConstrainer()->setFixedAspectRatio(screenAspectRatio);
     
     processorRef.getMidiHandler().setRepaintCallback([this] {
       juce::MessageManager::callAsync([this] { this->repaint(); });
