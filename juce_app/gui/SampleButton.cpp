@@ -46,13 +46,6 @@ void SampleButton::mouseExit(const juce::MouseEvent& event)
 
 void SampleButton::setEditMode(bool shouldBeInEditMode) {
     editMode = shouldBeInEditMode;
-
-
-    if (editMode) {
-      startFlashing();
-    } else {
-      stopFlashing();
-    }
     repaint();
 }
 
@@ -136,11 +129,6 @@ void SampleButton::setPlayingState(bool playing) {
   if (isPlaying != playing && selectedFilePath != "") {
     isPlaying = playing;
 
-    if (isPlaying) {
-      startFlashing();
-    } else {
-      stopFlashing();
-    }
     repaint();
   }
 }
@@ -199,8 +187,8 @@ if(selectedFilePath != newFile) {
 
 
 void SampleButton::timerCallback() {
-    flashOn = !flashOn;
-    repaint();
+    //flashOn = !flashOn;
+    //repaint();
 }
 
 void SampleButton::startFlashing() {
@@ -251,19 +239,19 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     juce::TextButton::paintButton(g, isMouseOverButton, isButtonDown);
 
     // Overlay a white flash if playing and flashOn
-    if (isPlaying && flashOn && selectedFilePath != "")
+    if (isPlaying && selectedFilePath != "")
     {
         g.setColour(juce::Colours::blue.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 
-    if (isPlaying && flashOn && selectedFilePath != "" && isArranger)
+    if (isPlaying && selectedFilePath != "" && isArranger)
     {
         g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 
-    if (!isPlaying && editMode && flashOn ) {
+    if (!isPlaying && editMode) {
         g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }

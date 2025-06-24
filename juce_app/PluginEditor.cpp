@@ -145,6 +145,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
         reverbLabel.setText("Reverb " + juce::String(reverbValue, 1) + "%", juce::dontSendNotification);
     };
     
+    reverbSlider.onValueChange();
+    
     
     // Set the size of the editor
     // Set the size of the editor to 90% of the screen size
@@ -185,6 +187,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.drawFittedText (currentPreset, getLocalBounds(), juce::Justification::topLeft, 1);
 
     tempoSlider.onValueChange();
+    reverbSlider.onValueChange();
     //color for easy debugging
     // g.fillRect(tempoSlider.getBounds().toFloat().reduced(2.0f));
 

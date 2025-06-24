@@ -4,3 +4,4 @@
 /juce_app/build
 /juce_app/.cache
 /juce_app/out
+/juce_app/compile_commands.json
