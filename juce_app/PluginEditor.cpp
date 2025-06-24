@@ -264,179 +264,253 @@ void AudioPluginAudioProcessorEditor::resized()
     }
 
 
-    // Tempo slider
-
-    // Set the size of the tempo slider to match the sample button width and 1/4 of its height);
-
-    // Place the tempo slider next to sample 4 (index 3), scaling proportionally with sample button size
-    if (sampleButtons.size() >= 4)
+// Tempo slider
+// Set the size of the tempo slider to match the sample button width and 1/4 of its height);
+// Place the tempo slider next to sample 4 (index 3), scaling proportionally with sample button size
+if (sampleButtons.size() >= 4)
+{
+    // Get the bounds of sample button 4 (index 3)
+    auto& sample4 = sampleButtons[3];
+    // Get the bounds of the sample button to position the tempo slider
+    auto bounds = sample4.getBounds();
+    // Slider width and height proportional to sample button size
+    int sliderWidth = buttonWidth * 2;
+    int sliderHeight = buttonHeight * 0.25;
+    int sliderX = bounds.getRight() + margin;
+    int sliderY = bounds.getY() + (bounds.getHeight() - sliderHeight) / 2;
+    
+    // Get the component's total bounds to check boundaries
+    auto componentBounds = getLocalBounds();
+    
+    // Check if slider would go out of bounds horizontally and adjust width only
+    if (sliderX + sliderWidth > componentBounds.getWidth())
     {
-        // Get the bounds of sample button 4 (index 3)
-        auto& sample4 = sampleButtons[3];
-        // Get the bounds of the sample button to position the tempo slider
-        auto bounds = sample4.getBounds();
-
-
-        // Slider width and height proportional to sample button size
-        int sliderWidth = buttonWidth * 2;
-        int sliderHeight = buttonHeight * 0.25;
-
-        int sliderX = bounds.getRight() + margin;
-        int sliderY = bounds.getY() + (bounds.getHeight() - sliderHeight) / 2;
-        tempoSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
-
-        // Position the tempo label above the tempo slider, proportional height
-        int labelHeight = sliderHeight * 0.8;
-        tempoLabel.setBounds(tempoSlider.getX(), tempoSlider.getY() - labelHeight - margin / 2, tempoSlider.getWidth(), labelHeight);
+        sliderWidth = componentBounds.getWidth() - sliderX - margin;
+        // Ensure minimum width
+        if (sliderWidth < 50)
+        {
+            sliderWidth = 50;
+        }
     }
+    
+    tempoSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+    
+    // Position the tempo label above the tempo slider, proportional height
+    int labelHeight = sliderHeight * 0.8;
+    tempoLabel.setBounds(tempoSlider.getX(), tempoSlider.getY() - labelHeight - margin / 2, tempoSlider.getWidth(), labelHeight);
+}
 
-    // Reverb slider
-    // Place the reverb slider to the right of sample 8 (index 7), scaling proportionally
-    if (sampleButtons.size() >= 8)
+// Reverb slider
+// Place the reverb slider to the right of sample 8 (index 7), scaling proportionally
+if (sampleButtons.size() >= 8)
+{
+    // Get the bounds of sample button 8 (index 7)
+    auto& sample8 = sampleButtons[7];
+    auto bounds = sample8.getBounds();
+    int sliderWidth = buttonWidth * 2;
+    int sliderHeight = buttonHeight * 0.25;
+    int sliderX = bounds.getRight() + margin;
+    int sliderY = bounds.getY() + (bounds.getHeight() - sliderHeight) / 2;
+    
+    // Get the component's total bounds to check boundaries
+    auto componentBounds = getLocalBounds();
+    
+    // Check if slider would go out of bounds horizontally and adjust width only
+    if (sliderX + sliderWidth > componentBounds.getWidth())
     {
-        // Get the bounds of sample button 8 (index 7)
-        auto& sample8 = sampleButtons[7];
-        auto bounds = sample8.getBounds();
-
-        int sliderWidth = buttonWidth * 2;
-        int sliderHeight = buttonHeight * 0.25;
-        int sliderX = bounds.getRight() + margin;
-        int sliderY = bounds.getY() + (bounds.getHeight() - sliderHeight) / 2;
-        reverbSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
-
-        // Position the reverb label above the reverb slider, proportional height
-        int labelHeight = sliderHeight * 0.8;
-        reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - labelHeight - margin / 2, reverbSlider.getWidth(), labelHeight);
+        sliderWidth = componentBounds.getWidth() - sliderX - margin;
+        // Ensure minimum width
+        if (sliderWidth < 50)
+        {
+            sliderWidth = 50;
+        }
     }
+    
+    reverbSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+    
+    // Position the reverb label above the reverb slider, proportional height
+    int labelHeight = sliderHeight * 0.8;
+    reverbLabel.setBounds(reverbSlider.getX(), reverbSlider.getY() - labelHeight - margin / 2, reverbSlider.getWidth(), labelHeight);
+}
 
-    // =========== End Sample Buttons Layout ===========
-        
     // =========== Fills and Verses Layout with FlexBox ===========
 
     // Define area for fills and verses at the bottom 40% of the editor
     int bottomAreaHeight = getHeight() * 0.52f;
     auto bottomArea = getLocalBounds().removeFromBottom(bottomAreaHeight);
 
-    // Calculate margins and button size for 4x2 grid (fills on top row, verses on bottom row)
+    // Calculate margins and button size for 4x2 grid (fills on top row, verses
+    // on bottom row)
     const int numFills = 4;
     const int numVerses = 4;
     const int bottomNumCols = 4;
     const int bottomNumRows = 2;
 
     int bottomMargin = juce::roundToInt(getWidth() * 0.005f); // 1% of width
-    int bottomTotalMarginWidth = (bottomNumCols + 1) * bottomMargin;
+    bottomMargin = std::max(bottomMargin, 2); // Minimum margin of 2 pixels
+
+    // Reserve space for intro/outro buttons (6 total columns: intro + 4 fills +
+    // outro)
+    const int totalCols = 6;
+    int bottomTotalMarginWidth = (totalCols + 1) * bottomMargin;
+
     // Add extra margin at the bottom for better spacing
-    int extraBottomMargin = bottomMargin * 5;
-    int bottomTotalMarginHeight = (bottomNumRows + 1) * bottomMargin + extraBottomMargin;
+    int extraBottomMargin = bottomMargin * 2; // Reduced from 5 to 2
+    int bottomTotalMarginHeight =
+        (bottomNumRows + 1) * bottomMargin + extraBottomMargin;
 
     // Calculate the maximum square size that fits in the available area
     int bottomAvailableWidth = bottomArea.getWidth() - bottomTotalMarginWidth;
-    int bottomAvailableHeight = bottomArea.getHeight() - bottomTotalMarginHeight;
+    int bottomAvailableHeight =
+        bottomArea.getHeight() - bottomTotalMarginHeight;
 
-    int bottomButtonSizeByWidth = bottomAvailableWidth / bottomNumCols;
+    // Ensure minimum available space
+    bottomAvailableWidth = std::max(bottomAvailableWidth,
+                                    totalCols * 20); // Minimum 20px per column
+    bottomAvailableHeight = std::max(
+        bottomAvailableHeight, bottomNumRows * 20); // Minimum 20px per row
+
+    int bottomButtonSizeByWidth = bottomAvailableWidth / totalCols;
     int bottomButtonSizeByHeight = bottomAvailableHeight / bottomNumRows;
-    int bottomButtonSize = std::min(bottomButtonSizeByWidth, bottomButtonSizeByHeight);
+    int bottomButtonSize =
+        std::min(bottomButtonSizeByWidth, bottomButtonSizeByHeight);
+
+    // Ensure minimum button size
+    bottomButtonSize = std::max(bottomButtonSize, 15);
 
     int bottomButtonWidth = bottomButtonSize;
     int bottomButtonHeight = bottomButtonSize;
 
-    // Fills row (top row)
+    // Calculate the actual space needed for the button grid
+    int actualGridWidth =
+        totalCols * bottomButtonWidth + (totalCols + 1) * bottomMargin;
+    int actualGridHeight = bottomNumRows * bottomButtonHeight +
+                           (bottomNumRows + 1) * bottomMargin +
+                           extraBottomMargin;
+
+    // Center the grid if there's extra space
+    int gridStartX =
+        bottomArea.getX() + (bottomArea.getWidth() - actualGridWidth) / 2;
+    int gridStartY =
+        bottomArea.getY() + (bottomArea.getHeight() - actualGridHeight) / 2;
+
+    // Ensure grid doesn't go outside bounds
+    gridStartX = std::max(gridStartX, bottomArea.getX());
+    gridStartY = std::max(gridStartY, bottomArea.getY());
+
+    // Create areas for each row within the centered grid
+    auto fillsRowArea =
+        juce::Rectangle<int>(gridStartX, gridStartY + bottomMargin,
+                             actualGridWidth, bottomButtonHeight);
+
+    auto versesRowArea = juce::Rectangle<int>(
+        gridStartX,
+        gridStartY + bottomMargin + bottomButtonHeight + bottomMargin,
+        actualGridWidth, bottomButtonHeight);
+
+    // =========== Position Intro and Outro Buttons ===========
+
+    // Intro button - positioned at the start of the grid
+    int introX = gridStartX + bottomMargin;
+    int introY = fillsRowArea.getY();
+    int introOutroButtonSize = bottomButtonWidth;
+
+    // Ensure intro button stays within bounds
+    introX = std::max(introX, bottomArea.getX());
+    introX = std::min(introX, bottomArea.getRight() - introOutroButtonSize);
+
+    introButton.setBounds(introX, introY, introOutroButtonSize,
+                          introOutroButtonSize);
+
+    // Outro button - positioned at the end of the grid
+    int outroX =
+        gridStartX + actualGridWidth - bottomMargin - introOutroButtonSize;
+    int outroY = fillsRowArea.getY();
+
+    // Ensure outro button stays within bounds
+    outroX = std::max(outroX, bottomArea.getX());
+    outroX = std::min(outroX, bottomArea.getRight() - introOutroButtonSize);
+
+    outroButton.setBounds(outroX, outroY, introOutroButtonSize,
+                          introOutroButtonSize);
+
+    // =========== Fills FlexBox Layout ===========
+
     juce::FlexBox fillsFlexBox;
     fillsFlexBox.flexDirection = juce::FlexBox::Direction::row;
     fillsFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
     fillsFlexBox.alignItems = juce::FlexBox::AlignItems::center;
 
+    // Create area for fills (between intro and outro buttons)
+    auto fillsArea = juce::Rectangle<int>(
+        introButton.getRight() + bottomMargin, fillsRowArea.getY(),
+        outroButton.getX() - introButton.getRight() - 2 * bottomMargin,
+        fillsRowArea.getHeight());
+
     // Create buttons for fills
-    // Ensure we only add as many buttons as available
-    for (int i = 0; i < numFills && i < fillsButtons.size(); ++i)
-    {
+    for (int i = 0; i < numFills && i < fillsButtons.size(); ++i) {
         fillsFlexBox.items.add(
             juce::FlexItem(fillsButtons[i])
-                // Set the width and height of each fill button
                 .withWidth(bottomButtonWidth)
                 .withHeight(bottomButtonHeight)
-                .withMargin(bottomMargin)
+                .withMargin(bottomMargin /
+                            2) // Smaller margin within the fills area
         );
     }
 
-    // Verses row (bottom row)
+    // Perform layout for fills
+    fillsFlexBox.performLayout(fillsArea);
+
+    // =========== Verses FlexBox Layout ===========
+
     juce::FlexBox versesFlexBox;
     versesFlexBox.flexDirection = juce::FlexBox::Direction::row;
     versesFlexBox.justifyContent = juce::FlexBox::JustifyContent::center;
     versesFlexBox.alignItems = juce::FlexBox::AlignItems::center;
 
+    // Create area for verses (full width, centered)
+    auto versesArea = juce::Rectangle<int>(
+        gridStartX + bottomMargin, versesRowArea.getY(),
+        actualGridWidth - 2 * bottomMargin, versesRowArea.getHeight());
+
     // Create buttons for verses
-    // Ensure we only add as many buttons as available
-    for (int i = 0; i < numVerses && i < verseButtons.size(); ++i)
-    {
-        versesFlexBox.items.add(
-            juce::FlexItem(verseButtons[i])
-                // Set the width and height of each verse button
-                .withWidth(bottomButtonWidth)
-                .withHeight(bottomButtonHeight)
-                .withMargin(bottomMargin)
-        );
+    for (int i = 0; i < numVerses && i < verseButtons.size(); ++i) {
+        versesFlexBox.items.add(juce::FlexItem(verseButtons[i])
+                                    .withWidth(bottomButtonWidth)
+                                    .withHeight(bottomButtonHeight)
+                                    .withMargin(bottomMargin / 2));
     }
 
-    // Split bottomArea into two rows for fills and verses
-    auto fillsRowArea = bottomArea.removeFromTop(static_cast<int>(bottomButtonHeight + 2 * margin));
-    auto versesRowArea = bottomArea.removeFromTop(static_cast<int>(bottomButtonHeight + 2 * margin));
+    // Perform layout for verses
+    versesFlexBox.performLayout(versesArea);
 
-    // Perform layout for fills and verses using FlexBox
-    fillsFlexBox.performLayout(fillsRowArea);
-    versesFlexBox.performLayout(versesRowArea);
+    // =========== Edit and Stop Buttons Layout ===========
 
-    // =========== End Fills and Verses Layout ===========
+    // Calculate the size of the edit and stop buttons
+    const int editStopButtonSize =
+        std::max(bottomButtonWidth / 3, 15); // Minimum 15px
 
+    // Position edit button aligned with intro button
+    int editX = introButton.getX();
+    int editY = versesRowArea.getBottom() + bottomMargin;
 
-    // =========== Intro, Outro, Edit, and Stop Buttons Layout ===========
+    // Ensure edit button stays within bottom area bounds
+    editY = std::min(editY, bottomArea.getBottom() - editStopButtonSize);
+    editX = std::max(editX, bottomArea.getX());
+    editX = std::min(editX, bottomArea.getRight() - editStopButtonSize);
 
-    // Calculate positions for intro, outro, edit, and stop buttons
-    // Get the bounds of the first and last fill buttons
-    int fillsX0 = fillsButtons.size() > 0 ? fillsButtons[0].getBounds().getX() : bottomArea.getX();
-    int fillsY0 = fillsButtons.size() > 0 ? fillsButtons[0].getBounds().getY() : bottomArea.getY();
-    int fillsButtonSize = bottomButtonWidth;
-
-    // Intro and Outro buttons - scale with fill buttons, stay squared, and keep same spacing
-    int introOutroButtonSize = bottomButtonWidth; // Keep square, same as fill button
-
-
-    // Intro button
-    // Intro button on the left of the fills row, with same spacing as between fill buttons
-    int introX = fillsX0 - bottomMargin - extraBottomMargin - introOutroButtonSize;
-    // If there are fills, position it before the first fill button
-    // If no fills, position it at the same X as the first fill button
-    int introY = fillsY0;
-    introButton.setBounds(introX, introY, introOutroButtonSize, introOutroButtonSize);
-
-
-    // Outro button
-    // Outro button on the right of the fills row, with same spacing as between fill buttons
-    // If there are fills, position it after the last fill button
-    int outroX = (fillsButtons.size() > 0)
-        ? fillsButtons[fillsButtons.size() - 1].getBounds().getRight() + bottomMargin + extraBottomMargin
-        : fillsX0 + numFills * (fillsButtonSize + bottomMargin);;
-    int outroY = fillsY0;
-    outroButton.setBounds(outroX, outroY, introOutroButtonSize, introOutroButtonSize);
-
-
-    // Edit and Stop buttons
-
-    // Edit button 
-    // Calculate the size of the edit and stop buttons based on the bottom button width
-    const int editStopButtonSize = bottomButtonWidth / 2;
-    // Align edit button X with intro button, Y with verse row
-    int editX = introButton.getX() ;
-    int editY = versesRowArea.getY() + editStopButtonSize;
     editButton.setBounds(editX, editY, editStopButtonSize, editStopButtonSize);
 
-    // Stop button
-    // Align stop button X with outro button, Y with verse row
-    int stopX = outroButton.getX() + editStopButtonSize;
-    int stopY = versesRowArea.getY() + editStopButtonSize;
+    // Position stop button aligned with outro button
+    int stopX = outroButton.getRight() - editStopButtonSize;
+    int stopY = versesRowArea.getBottom() + bottomMargin;
+
+    // Ensure stop button stays within bottom area bounds
+    stopY = std::min(stopY, bottomArea.getBottom() - editStopButtonSize);
+    stopX = std::max(stopX, bottomArea.getX());
+    stopX = std::min(stopX, bottomArea.getRight() - editStopButtonSize);
+
     stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
 
-    // int stopX = outroButton.getX() + verseButtonSize - editStopButtonSize;
-    // int stopY = verseY0 + editStopButtonSize - editSpacing;
-    // stopButton.setBounds(stopX, stopY, editStopButtonSize, editStopButtonSize);
+    // =========== End Layout ===========
 }
