@@ -136,6 +136,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
     limiter.setRelease(50.0f);   // ms
 
 
+    reverb.reset();
     reverb.prepare(spec);
 
     highPass.prepare(spec);
@@ -188,7 +189,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     midiHandler.logMidiMessages(midiMessages, *presetManager);
 
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumInputChannels  = buffer.getNumChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     // In case we have more outputs than inputs, this code clears any output
