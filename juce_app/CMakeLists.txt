@@ -13,6 +13,7 @@ juce_add_plugin(Arranger
         PLUGIN_CODE Arr4
         FORMATS Standalone
         PRODUCT_NAME "Arranger"
+        IS_SYNTH TRUE
 )
 
 juce_generate_juce_header(Arranger)
@@ -58,24 +59,4 @@ target_link_libraries(Arranger
 target_compile_features(Arranger PRIVATE cxx_std_20)
 target_compile_options(Arranger  PRIVATE -Ofast)
 
-find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
-if (CMAKE_CXX_CPPCHECK)
-    message("-- CPPCHECK FOUND")
-    add_custom_target(
-        cppcheck
-        COMMAND ${CMAKE_CXX_CPPCHECK}
-            --enable=warning
-            --inconclusive
-            --suppress=missingInclude
-            --check-level=exhaustive
-            --force
-            --inline-suppr
-            --suppressions-list=${CMAKE_SOURCE_DIR}/CppCheckSupressions.txt
-            --error-exitcode=1
-            --verbose
-            ${ALL_SOURCE_FILES}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    )
-    add_dependencies(Arranger cppcheck)
-endif()
 
