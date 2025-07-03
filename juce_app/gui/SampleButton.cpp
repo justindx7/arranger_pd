@@ -19,7 +19,7 @@ SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorV
     if(isArranger) 
         setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
 
-    //updater.addAnimator(flashAnimator);
+    updater.addAnimator(flashAnimator);
     
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
@@ -264,7 +264,7 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     }
 
     if (!isPlaying && editMode) {
-        g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.setColour(juce::Colours::white.withAlpha(0.7f * flashAmount)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 

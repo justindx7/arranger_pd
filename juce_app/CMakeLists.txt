@@ -66,6 +66,7 @@ target_link_libraries(Arranger
         juce::juce_audio_formats
         juce::juce_gui_basics
         juce_animation
+        juce::juce_opengl
 
         PUBLIC
         juce::juce_recommended_config_flags

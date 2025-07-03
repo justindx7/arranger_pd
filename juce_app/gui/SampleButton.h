@@ -124,7 +124,7 @@ private:
               return 0.5f * (2.0f - std::cos(juce::MathConstants<float>::twoPi * t));
             })
             .withValueChangedCallback([&](auto value) {
-              flashAmount = (value / 2.f);
+              flashAmount = juce::makeAnimationLimits(0,1).lerp(value / 2.f);
               repaint();
             })
             .runningInfinitely()
