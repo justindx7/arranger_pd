@@ -19,6 +19,7 @@ SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorV
     if(isArranger) 
         setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
 
+    updater.addAnimator(flashAnimator);
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
     //setColour(juce::TextButton::textColourOffId, juce::Colours::white);
@@ -46,6 +47,15 @@ void SampleButton::mouseExit(const juce::MouseEvent& event)
 
 void SampleButton::setEditMode(bool shouldBeInEditMode) {
     editMode = shouldBeInEditMode;
+
+    if (editMode ) {
+      flashAnimator.start();
+    } else {
+      flashAnimator.complete(); 
+    }    
+
+
+
     repaint();
 }
 
@@ -186,10 +196,10 @@ if(selectedFilePath != newFile) {
   }
 
 
-void SampleButton::timerCallback() {
+//void SampleButton::timerCallback() {
     //flashOn = !flashOn;
     //repaint();
-}
+//}
 
 void SampleButton::startFlashing() {
     flashOn = false;
@@ -197,18 +207,18 @@ void SampleButton::startFlashing() {
       // GET BPM
       float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
       int ms = (60000.f / BPM);
-      startTimer(ms);
+      //startTimer(ms);
 
     } else if (isPlaying) {
-      startTimer(300); // Flash every 300ms
+      //startTimer(300); // Flash every 300ms
     } else {
 
-      startTimer(500);
+      //startTimer(500);
     }
 }
 
 void SampleButton::stopFlashing() {
-    stopTimer();
+    //stopTimer();
     flashOn = false;
 
     if(isArranger)
@@ -247,12 +257,13 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
 
     if (isPlaying && selectedFilePath != "" && isArranger)
     {
+        //DBG(flashAmount);
         g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 
     if (!isPlaying && editMode) {
-        g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.setColour(juce::Colours::white.withAlpha(0.7f * flashAmount)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 

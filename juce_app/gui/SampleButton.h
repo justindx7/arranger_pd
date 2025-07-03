@@ -1,6 +1,6 @@
 #pragma once
-
 #include <JuceHeader.h>
+#include <juce_animation/juce_animation.h>
 
 class SampleEditPopup : public juce::Component
 {
@@ -37,7 +37,8 @@ private:
 };
 
 
-class SampleButton : public juce::TextButton,public juce::ValueTree::Listener, private juce::Timer {
+class SampleButton : public juce::TextButton, public juce::ValueTree::Listener
+{
 public:
     SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference, bool isArrangeButton = false);
     ~SampleButton () override;
@@ -68,6 +69,7 @@ protected:
     void paintButton(juce::Graphics&, bool isMouseOverButton, bool isButtonDown) override;
 
 private:
+
     void valueTreeChildAdded(juce::ValueTree& parent, juce::ValueTree& child) override;
     void valueTreeChildRemoved(juce::ValueTree& parent, juce::ValueTree& child, int) override;
     //void valueTreeChildChanged(juce::ValueTree& parent, juce::ValueTree& child)
@@ -86,7 +88,6 @@ private:
     bool isArranger;
 
     bool flashOn = false;
-    void timerCallback() override;
     void startFlashing();
     void stopFlashing();
 
@@ -109,6 +110,25 @@ private:
         result = "_";
       return result;
     }
+
+
+
+    juce::VBlankAnimatorUpdater updater {this};
+    float flashAmount = 0.0f;
+    juce::Animator flashAnimator =
+        ValueAnimatorBuilder{}
+            .withDurationMs(1000)
+            .withEasing([](float t) {
+              // t goes 0..1, this makes it go 0->1->0 smoothly (cosine
+              // ping-pong)
+              return 0.5f * (2.0f - std::cos(juce::MathConstants<float>::twoPi * t));
+            })
+            .withValueChangedCallback([&](auto value) {
+              flashAmount = (value / 2.f);
+              repaint();
+            })
+            .runningInfinitely()
+            .build();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleButton )
 };

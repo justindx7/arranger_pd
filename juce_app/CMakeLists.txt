@@ -2,9 +2,23 @@ cmake_minimum_required(VERSION 3.22)
 
 project(Arranger VERSION 0.0.1)
 
+# Look for JUCE in the installed location
 list(APPEND CMAKE_PREFIX_PATH "~/.local/lib/JUCE")
 
+
+find_path(JUCE_ROOT_DIR "~/.local/lib/JUCE")
 find_package(JUCE CONFIG REQUIRED)
+
+message("JUCE found at: ${JUCE_DIR}")
+if(JUCE_VERSION)
+    message("JUCE version: ${JUCE_VERSION}")
+endif()
+
+# Debug: List all available targets
+get_property(imported_targets DIRECTORY PROPERTY IMPORTED_TARGETS)
+message("Available imported targets: ${imported_targets}")
+
+juce_add_module(/Users/justin/.local/lib/JUCE/include/JUCE-8.0.3/modules/juce_animation)
 
 juce_add_plugin(Arranger
         VERSION 0.0.1
@@ -50,6 +64,8 @@ target_link_libraries(Arranger
         juce::juce_audio_utils
         juce::juce_dsp
         juce::juce_audio_formats
+        juce::juce_gui_basics
+        juce_animation
 
         PUBLIC
         juce::juce_recommended_config_flags
