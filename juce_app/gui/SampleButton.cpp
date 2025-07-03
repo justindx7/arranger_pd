@@ -19,7 +19,7 @@ SampleButton::SampleButton(const juce::String& buttonText, juce::AudioProcessorV
     if(isArranger) 
         setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
 
-    updater.addAnimator(flashAnimator);
+    //updater.addAnimator(flashAnimator);
     
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
     //setColour(juce::TextButton::textColourOnId, juce::Colours::white);
@@ -48,15 +48,6 @@ void SampleButton::mouseExit(const juce::MouseEvent& event)
 
 void SampleButton::setEditMode(bool shouldBeInEditMode) {
     editMode = shouldBeInEditMode;
-
-    if (editMode ) {
-      flashAnimator.start();
-    } else {
-      flashAnimator.complete(); 
-    }    
-
-
-
     repaint();
 }
 
@@ -140,6 +131,31 @@ void SampleButton::setPlayingState(bool playing) {
   if (isPlaying != playing && selectedFilePath != "") {
     isPlaying = playing;
 
+    /* if (isPlaying) {
+
+      float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
+      int ms = (60000.f / BPM);
+    flashAnimator =
+        ValueAnimatorBuilder{}
+            .withDurationMs(ms)
+            .withEasing([](float t) {
+              // t goes 0..1, this makes it go 0->1->0 smoothly (cosine
+              // ping-pong)
+              return 0.5f * (2.0f - std::cos(juce::MathConstants<float>::twoPi * t));
+            })
+            .withValueChangedCallback([&](auto value) {
+              flashAmount = juce::makeAnimationLimits(0,1).lerp(value / 2.f);
+              repaint();
+            })
+            .runningInfinitely()
+            .build();
+
+
+      flashAnimator.start();
+    } else {
+      flashAnimator.complete(); 
+    }    
+*/
     repaint();
   }
 }
@@ -259,12 +275,12 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     if (isPlaying && selectedFilePath != "" && isArranger)
     {
         //DBG(flashAmount);
-        g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
+        g.setColour(juce::Colours::green.withAlpha(0.7f * flashAmount)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 
     if (!isPlaying && editMode) {
-        g.setColour(juce::Colours::white.withAlpha(0.7f * flashAmount)); // 0.7 = 70% opacity, adjust as needed
+        g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 
