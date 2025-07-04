@@ -275,7 +275,7 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     if (isPlaying && selectedFilePath != "" && isArranger)
     {
         //DBG(flashAmount);
-        g.setColour(juce::Colours::green.withAlpha(0.7f * flashAmount)); // 0.7 = 70% opacity, adjust as needed
+        g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
         g.fillRect(getLocalBounds());
     }
 
