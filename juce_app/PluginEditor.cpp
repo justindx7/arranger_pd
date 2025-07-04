@@ -62,7 +62,10 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     addAndMakeVisible(editButton);
     editButton.onClick = [&]() {
       isEditMode = !isEditMode;
-      std::cout << isEditMode << std::endl;
+
+      if(isEditMode){
+          stopButton.onClick();
+      }
 
       introButton.setEditMode(isEditMode);
       outroButton.setEditMode(isEditMode);
