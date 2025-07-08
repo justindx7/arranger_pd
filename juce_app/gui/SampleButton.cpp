@@ -241,9 +241,12 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     // Overlay a white flash if playing and flashOn
     
     // Skip if no file
-    if (selectedFilePath.isEmpty()) {
+    if (selectedFilePath.isEmpty() && !editMode) {
         g.setColour(juce::Colours::darkgrey); // Solid color = faster
         g.fillRect(bounds);
+        g.setColour(juce::Colours::lightgrey);
+        g.setFont (14.0f);
+        g.drawFittedText (getButtonText(), getLocalBounds(), juce::Justification::centred, 1);
         return;
     }
 
@@ -256,5 +259,8 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     } else if (editMode) {
       g.setColour(juce::Colours::white); // Solid white, no alpha
       g.fillRect(bounds);
+      g.setColour (juce::Colours::black);
+      g.setFont (20.0f);
+      g.drawFittedText (getButtonText(), getLocalBounds(), juce::Justification::centred, 1);
     }
 }

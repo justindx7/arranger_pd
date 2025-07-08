@@ -100,10 +100,12 @@ private:
     player->playSample();
 
     juce::MessageManager::callAsync([buttonPtr = sampleButton] {
-            if (buttonPtr)
-                buttonPtr->setPlayingState(true);
-                buttonPtr->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
-            });
+      if (buttonPtr) {
+        buttonPtr->setPlayingState(true);
+        buttonPtr->setColour(juce::TextButton::buttonColourId,
+                             juce::Colours::darkblue);
+      }
+    });
 
         } else {
             arrangerLogic->currentSection = ArrangerSection::None;
