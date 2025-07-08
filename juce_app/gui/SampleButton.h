@@ -37,7 +37,7 @@ private:
 };
 
 
-class SampleButton : public juce::TextButton, public juce::ValueTree::Listener
+class SampleButton : public juce::TextButton, public juce::ValueTree::Listener, private juce::Timer
 {
 public:
     SampleButton(const juce::String& buttonText, juce::AudioProcessorValueTreeState& Reference, bool isArrangeButton = false);
@@ -88,6 +88,7 @@ private:
     bool isArranger;
 
     bool flashOn = false;
+    void timerCallback() override;
     void startFlashing();
     void stopFlashing();
 
@@ -110,25 +111,6 @@ private:
         result = "_";
       return result;
     }
-
-
-
-    juce::VBlankAnimatorUpdater updater {this};
-    float flashAmount = 0.0f;
-    juce::Animator flashAnimator =
-        ValueAnimatorBuilder{}
-            .withDurationMs(1000)
-            .withEasing([](float t) {
-              // t goes 0..1, this makes it go 0->1->0 smoothly (cosine
-              // ping-pong)
-              return 0.5f * (2.0f - std::cos(juce::MathConstants<float>::twoPi * t));
-            })
-            .withValueChangedCallback([&](auto value) {
-              flashAmount = juce::makeAnimationLimits(0,1).lerp(value / 2.f);
-              repaint();
-            })
-            .runningInfinitely()
-            .build();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SampleButton )
 };

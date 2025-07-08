@@ -34,14 +34,12 @@ SampleButton::~SampleButton() {
 void SampleButton::mouseEnter(const juce::MouseEvent& event)
 {
     //setColour(juce::TextButton::buttonColourId, juce::Colours::deepskyblue);
-    repaint();
     juce::TextButton::mouseEnter(event);
 }
 
 void SampleButton::mouseExit(const juce::MouseEvent& event)
 {
     //setColour(juce::TextButton::buttonColourId, juce::Colours::darkgrey);
-    repaint();
     juce::TextButton::mouseExit(event);
 }
 
@@ -111,10 +109,6 @@ void SampleButton::clicked()
         if (onNormalClick)
             onNormalClick();
 
-        if(isArranger && !isPlaying) {
-            //setColour(juce::TextButton::buttonColourId, juce::Colours::green);
-            //repaint();
-        }
     }
 }
 
@@ -130,33 +124,13 @@ void SampleButton::setPlayingState(bool playing) {
 
   if (isPlaying != playing && selectedFilePath != "") {
     isPlaying = playing;
-
-    /* if (isPlaying) {
-
-      float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
-      int ms = (60000.f / BPM);
-    flashAnimator =
-        ValueAnimatorBuilder{}
-            .withDurationMs(ms)
-            .withEasing([](float t) {
-              // t goes 0..1, this makes it go 0->1->0 smoothly (cosine
-              // ping-pong)
-              return 0.5f * (2.0f - std::cos(juce::MathConstants<float>::twoPi * t));
-            })
-            .withValueChangedCallback([&](auto value) {
-              flashAmount = juce::makeAnimationLimits(0,1).lerp(value / 2.f);
-              repaint();
-            })
-            .runningInfinitely()
-            .build();
-
-
-      flashAnimator.start();
-    } else {
-      flashAnimator.complete(); 
-    }    
-*/
     repaint();
+
+    if (isPlaying) {
+        startFlashing();
+    } else {
+        stopFlashing();
+    }
   }
 }
 
@@ -212,11 +186,10 @@ if(selectedFilePath != newFile) {
     }
   }
 
-
-//void SampleButton::timerCallback() {
-    //flashOn = !flashOn;
-    //repaint();
-//}
+void SampleButton::timerCallback() {
+    flashOn = !flashOn;
+    repaint();
+}
 
 void SampleButton::startFlashing() {
     flashOn = false;
@@ -224,23 +197,16 @@ void SampleButton::startFlashing() {
       // GET BPM
       float BPM = APVTSRef.getRawParameterValue("uBPM")->load();
       int ms = (60000.f / BPM);
-      //startTimer(ms);
+      startTimer(ms);
 
     } else if (isPlaying) {
-      //startTimer(300); // Flash every 300ms
-    } else {
-
-      //startTimer(500);
+      startTimer(600); 
     }
 }
 
 void SampleButton::stopFlashing() {
-    //stopTimer();
+    stopTimer();
     flashOn = false;
-
-    if(isArranger)
-        setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
-
     repaint();
 }
 
@@ -260,33 +226,35 @@ void SampleButton::valueTreeChildRemoved(juce::ValueTree& parent, juce::ValueTre
     }
 }
 
-void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown)
-{
+void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool isButtonDown){
+
+    setBufferedToImage(true);
     // Draw the normal button
     juce::TextButton::paintButton(g, isMouseOverButton, isButtonDown);
 
+    if(flashOn) {
+        return;
+    }
+
+
+    auto bounds = getLocalBounds();
     // Overlay a white flash if playing and flashOn
-    if (isPlaying && selectedFilePath != "")
-    {
-        g.setColour(juce::Colours::blue.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
-        g.fillRect(getLocalBounds());
+    
+    // Skip if no file
+    if (selectedFilePath.isEmpty()) {
+        g.setColour(juce::Colours::darkgrey); // Solid color = faster
+        g.fillRect(bounds);
+        return;
     }
 
-    if (isPlaying && selectedFilePath != "" && isArranger)
-    {
-        //DBG(flashAmount);
-        g.setColour(juce::Colours::green.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
-        g.fillRect(getLocalBounds());
-    }
+    if (isPlaying) {
+      // One fillRect only
+      auto overlayColour = isArranger ? juce::Colours::darkgreen : juce::Colours::blue;
+      g.setColour(overlayColour); // Solid color = faster
+      g.fillRect(bounds);
 
-    if (!isPlaying && editMode) {
-        g.setColour(juce::Colours::white.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
-        g.fillRect(getLocalBounds());
-    }
-
-    if(selectedFilePath == "") {
-        setButtonText(originalButtonText);
-        g.setColour(juce::Colours::darkgrey.withAlpha(0.7f)); // 0.7 = 70% opacity, adjust as needed
-        g.fillRect(getLocalBounds());
+    } else if (editMode) {
+      g.setColour(juce::Colours::white); // Solid white, no alpha
+      g.fillRect(bounds);
     }
 }
