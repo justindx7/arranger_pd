@@ -1,7 +1,6 @@
 #include "ArrangerLogic.h"
 
 ArrangerLogic::ArrangerLogic() {
-
   for (int i = 0; i < static_cast<int>(ArrangerSection::None); ++i) {
     ArrangerSection section = static_cast<ArrangerSection>(i);
     SectionInfo info;
@@ -35,18 +34,25 @@ void ArrangerLogic::handleSectionStart() {
 
 void ArrangerLogic::update() {
 
+// crossed a bar checking
+
     if(sectionChangePending) {
         auto &cur = sections[currentSection];
         double pos = 0;
         if(cur.player) {
+            // get current play position and convert to MS
             pos = cur.player->getCurrentPosition() * 1000;
         }
 
         // Use a tolerance to check if pos is close to any bar location
-        constexpr double toleranceMs = 2.0; // 10 milliseconds tolerance
         bool found = false;
+
+        double prevPos = cur.lastCheckedPosition;
+        double currPos = pos;
+        cur.lastCheckedPosition = currPos;
+
         for (const auto& barLoc : cur.barLocations) {
-            if (std::abs(barLoc - pos) <= toleranceMs) {
+            if (prevPos < barLoc && currPos >= barLoc) {
                 found = true;
                 break;
             }

@@ -67,6 +67,7 @@ private:
     int barAmount = 0;
     bool isLoop = false;
 
+    double lastCheckedPosition = 0.0;
     ArrangerSection nextSection = ArrangerSection::None;
 
     bool isPlaying = false;
@@ -76,19 +77,29 @@ private:
        player->setPlaybackSpeed(speed);
     }
 
+    // TODO fix sample waiting 2 bars once next sample plays needs to be on every bar
+    
     void calculate() {
       barLocations.clear(); // Clear previous bar locations
+                           
       if (arrangerLogic) {
         double beatLengthMS = 60000 / arrangerLogic->BPM;
         double barLengthMS = 4 * beatLengthMS;
-        double bars = (player->getSampleLengthInSec() * 1000) / barLengthMS;
-        barAmount = bars;
 
-        DBG("Amount of Bars for: " << arrangerLogic->BPM << "BPM: " << bars);
+        double bars = (player->getSampleLengthInSec() * 1000) / barLengthMS;
+        barAmount = static_cast<int>(std::round(bars));
+        DBG("---------------------------------------------------------------------------------------------------");
+        DBG("");
+
+        DBG("Amount of Bars for: " << (int)thisSection << " "<<  arrangerLogic->BPM << "BPM: " << barAmount);
+
 
         for (int i = 1; i < bars; i++) {
           barLocations.insert(barLengthMS * i);
+          DBG( (barLengthMS * i) / 1000);
         }
+        DBG("");
+        DBG("---------------------------------------------------------------------------------------------------");
       }
     }
 
@@ -145,9 +156,12 @@ private:
             player->onSampleStopped = [&]() { 
                 isPlaying = false; 
                 sampleButton->setPlayingState(false);
+
               if (arrangerLogic->sectionChangePending) {
+
                 arrangerLogic->handleSectionEnd(arrangerLogic->nextSection);
                 arrangerLogic->sectionChangePending = false;
+
                 if(isLoop){player->loadSample();}
 
               } else if (isLoop) {
