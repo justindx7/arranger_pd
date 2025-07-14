@@ -44,5 +44,6 @@
         DBG("Other MIDI Message: " << msg.getDescription() << " at sample "
                                    << samplePosition);
       }
+
       }
   }

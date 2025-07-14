@@ -17,8 +17,11 @@ public:
         okButton.setButtonText("Assign");
         okButton.onClick = [this, onAssign] {
             int value = editor.getText().getIntValue();
-            if (value >= 1 && value <= 127){
-                if (onAssign) onAssign(value);
+            if (value >= 1 && value <= 128){
+
+                int pg1IsZeroStandard = value - 1;
+
+                if (onAssign) onAssign(pg1IsZeroStandard);
             }
             if (auto* w = findParentComponentOfClass<juce::DialogWindow>())
                 w->closeButtonPressed();
