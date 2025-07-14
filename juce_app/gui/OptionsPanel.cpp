@@ -1,4 +1,5 @@
 #include "OptionsPanel.h"
+#include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
 
 OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::function<void()> onClose)
     : Reference(ref), onCloseCallback(onClose)
@@ -68,6 +69,14 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     addAndMakeVisible(highpassSlider);
     highpassAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         Reference, "uHighpassFreq", highpassSlider);
+
+    // Audio settings button
+    addAndMakeVisible(audioSettingsButton);
+    audioSettingsButton.onClick = []() {
+    if (auto* window = juce::StandalonePluginHolder::getInstance()){
+        window->showAudioSettingsDialog();
+        }
+    };
 }
 
 void OptionsPanel::paint(juce::Graphics& g) {
@@ -99,6 +108,8 @@ void OptionsPanel::resized() {
 
     highpassLabel.setBounds(40, sliderY + 150, 120, 30);
     highpassSlider.setBounds(160, sliderY + 150, getWidth() - 200, sliderH);
+
+    audioSettingsButton.setBounds(40, sliderY + 250, w*2, h);
 
     closeButton.setBounds(getWidth() - 120, 10, 100, 50);
 }

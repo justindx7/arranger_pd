@@ -36,4 +36,6 @@ private:
     juce::Slider highpassSlider;
     juce::Label highpassLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> highpassAttachment;
+
+    juce::TextButton audioSettingsButton {"Audio Settings"};
 };

@@ -48,6 +48,7 @@ file(GLOB SERVICE_FILES "service/*.cpp")
 set(ALL_SOURCE_FILES
     PluginEditor.cpp
     PluginProcessor.cpp
+    CustomStandalone.cpp
     ${HANDLER_FILES}
     ${GUI_FILES}
     ${ARRANGER_FILES}
@@ -65,6 +66,7 @@ target_compile_definitions(Arranger
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
+        JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
 )
 
 target_link_libraries(Arranger
