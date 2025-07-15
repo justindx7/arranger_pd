@@ -1,5 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
+#include "../CustomStandaloneFilterWindow.h"
 
 class OptionsPanel : public juce::Component {
 public:

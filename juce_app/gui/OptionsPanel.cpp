@@ -1,5 +1,5 @@
 #include "OptionsPanel.h"
-#include <juce_audio_plugin_client/Standalone/juce_StandaloneFilterWindow.h>
+
 
 OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::function<void()> onClose)
     : Reference(ref), onCloseCallback(onClose)
@@ -73,9 +73,9 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     // Audio settings button
     addAndMakeVisible(audioSettingsButton);
     audioSettingsButton.onClick = []() {
-    if (auto* window = juce::StandalonePluginHolder::getInstance()){
-        window->showAudioSettingsDialog();
-        }
+
+    juce::StandalonePluginHolder::getInstance()->showAudioSettingsDialog();
+
     };
 }
 
