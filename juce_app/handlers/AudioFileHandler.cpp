@@ -108,8 +108,9 @@ void AudioFileHandler::playSample() {
 void AudioFileHandler::stopSample() {
     transportSource.setSource(nullptr);
     //transportSource.stop();
-    transportSource.setSource(readerSource.get(), 0, nullptr,
-                              readerSource->getAudioFormatReader()->sampleRate);
+    if (readerSource != nullptr && readerSource->getAudioFormatReader() != nullptr) {
+    transportSource.setSource(readerSource.get(), 0, nullptr,readerSource->getAudioFormatReader()->sampleRate);
+    }
 }
 
 void AudioFileHandler::shouldloadOnStop(bool loadOnStop){
