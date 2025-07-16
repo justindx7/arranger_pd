@@ -218,7 +218,8 @@ void PresetManager::loadMidiAssignments(){
   for (int i = 0; i < keys.size(); ++i) {
     auto key = keys.getAllKeys()[i];
     int midiNum = props.getIntValue(key, -1);
-    if (midiNum > 0) {
+
+    if (midiNum >= 0) {
       midiProgramAssignments.set(key, midiNum);
       midiProgramToPreset.set(midiNum,key);
     }
