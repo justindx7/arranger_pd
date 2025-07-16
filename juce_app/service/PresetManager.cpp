@@ -1,4 +1,5 @@
 #include "PresetManager.h"
+#include <utility>
 
 const juce::File PresetManager::defaultDirectory{juce::File::getSpecialLocation(juce::File::userDocumentsDirectory).getChildFile("songdata").getChildFile("presets")};
 const juce::String PresetManager::extension{"preset"};
@@ -161,26 +162,26 @@ void PresetManager::valueTreeRedirected(juce::ValueTree &treeWhichHasBeenChanged
     currentPreset.referTo(treeWhichHasBeenChanged.getPropertyAsValue(presetNameProperty, nullptr));
 }
 
-void PresetManager::assignMidiProgram(const juce::String &presetName,int midiProgram) {
-
-  midiProgramAssignments.set(presetName, midiProgram);
-  for (auto it = midiProgramAssignments.begin();it != midiProgramAssignments.end(); ++it) {
-    midiProgramToPreset.set(it.getValue(), it.getKey());
-  }
-  saveMidiAssignments();
+void PresetManager::assignMidiProgram(const juce::String &presetName, int midiProgram, int midiChannel) {
+    midiProgramAssignments.insert_or_assign(presetName, std::make_pair(midiProgram, midiChannel));
+    midiProgramToPreset.insert_or_assign(std::make_pair(midiProgram, midiChannel), presetName);
+    saveMidiAssignments();
 }
 
 void PresetManager::removeMidiProgram(const juce::String &presetName) {
-  midiProgramAssignments.remove(presetName);
-
-  for (auto it = midiProgramAssignments.begin();it != midiProgramAssignments.end(); ++it) {
-    midiProgramToPreset.set(it.getValue(), it.getKey());
-  }
-  saveMidiAssignments();
+    auto pair = midiProgramAssignments[presetName];
+    midiProgramAssignments.erase(presetName);
+    midiProgramToPreset.erase(pair);
+    saveMidiAssignments();
 }
 
-juce::String PresetManager::getPresetNameForMidiProgram(int midiProgram) const {
-    return midiProgramToPreset[midiProgram];
+juce::String PresetManager::getPresetNameForMidiProgram(int midiProgram, int midiChannel) const {
+    std::pair<int, int> key = {midiProgram, midiChannel};
+
+    auto it = midiProgramToPreset.find(key);
+    if (it != midiProgramToPreset.end())
+        return it->second;
+    return juce::String();
 }
 
 void PresetManager::saveMidiAssignments() {
@@ -196,8 +197,12 @@ void PresetManager::saveMidiAssignments() {
     props.removeValue(key);
   }
 
+  // Save assignments
   for (auto it = midiProgramAssignments.begin(); it != midiProgramAssignments.end(); ++it) {
-    props.setValue(it.getKey(), it.getValue());
+    auto pair = it->second;
+    // convert pair to string so i can store it with setValue
+    juce::String valueStr = juce::String(pair.first) + ":" + juce::String(pair.second);
+    props.setValue(it->first, valueStr);
   }
 
   props.saveIfNeeded();
@@ -217,11 +222,13 @@ void PresetManager::loadMidiAssignments(){
   auto keys = props.getAllProperties();
   for (int i = 0; i < keys.size(); ++i) {
     auto key = keys.getAllKeys()[i];
-    int midiNum = props.getIntValue(key, -1);
-
-    if (midiNum >= 0) {
-      midiProgramAssignments.set(key, midiNum);
-      midiProgramToPreset.set(midiNum,key);
+    juce::String valueStr = props.getValue(key, "");
+    auto tokens = juce::StringArray::fromTokens(valueStr, ":", "");
+    if (tokens.size() == 2) {
+        int program = tokens[0].getIntValue();
+        int channel = tokens[1].getIntValue();
+        midiProgramAssignments.insert_or_assign(key, std::make_pair(program, channel));
+        midiProgramToPreset.insert_or_assign(std::make_pair(program, channel), key);
     }
   }
 }

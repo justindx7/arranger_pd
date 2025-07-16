@@ -1,6 +1,17 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <unordered_map>
+
+namespace std {
+    template <>
+    struct hash<std::pair<int, int>> {
+        std::size_t operator()(const std::pair<int, int>& p) const noexcept {
+            // Combines the hashes of the two integers
+            return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+        }
+    };
+}
 
 class PresetManager : juce::ValueTree::Listener {
 public:
@@ -19,9 +30,10 @@ public:
   int loadNextPreset();
   int loadPreviousPreset();
 
-  void assignMidiProgram(const juce::String &presetName, int midiProgram);
+  void assignMidiProgram(const juce::String &presetName, int midiProgram,int midiChannel);
+
   void removeMidiProgram(const juce::String &presetName);
-  juce::String getPresetNameForMidiProgram(int midiProgram) const;
+  juce::String getPresetNameForMidiProgram(int midiProgram, int midiChannel) const;
   
   void saveMidiAssignments();
   void loadMidiAssignments();
@@ -29,7 +41,7 @@ public:
   static juce::StringArray getAllPresets();
   juce::String getCurrentPreset();
   
-  const juce::HashMap<juce::String, int> &getMidiProgramAssignments() { return midiProgramAssignments; }
+  const std::unordered_map<juce::String, std::pair<int,int>> &getMidiProgramAssignments() { return midiProgramAssignments; }
 
   void savePresetCategories();
   void loadPresetCategories();
@@ -38,8 +50,9 @@ public:
 
 private:
   void valueTreeRedirected(juce::ValueTree &treeWhichHasBeenChanged) override;
-  juce::HashMap<juce::String, int> midiProgramAssignments;
-  juce::HashMap<int, juce::String> midiProgramToPreset;
+
+  std::unordered_map<juce::String, std::pair<int,int> > midiProgramAssignments;
+  std::unordered_map<std::pair<int,int>, juce::String> midiProgramToPreset;
 
   
   juce::HashMap<juce::String, juce::String> presetCategories; // presetName -> category

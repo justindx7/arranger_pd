@@ -8,7 +8,8 @@
 
       if (msg.isProgramChange()) {
         int programNum = msg.getProgramChangeNumber();
-        juce::String presetName = manager->getPresetNameForMidiProgram(programNum);
+        int channel = msg.getChannel();
+        juce::String presetName = manager->getPresetNameForMidiProgram(programNum, channel);
 
         DBG("Program Change: Channel "
             << msg.getChannel() << " Program " << programNum << " -> Preset: "
