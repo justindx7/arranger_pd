@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "service/PresetManager.h"
 #include <memory>
 
 //==============================================================================
@@ -186,7 +187,7 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layou
 void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                                               juce::MidiBuffer& midiMessages)
 {
-    midiHandler.logMidiMessages(midiMessages, *presetManager);
+    midiHandler.logMidiMessages(midiMessages, presetManager);
 
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = buffer.getNumChannels();

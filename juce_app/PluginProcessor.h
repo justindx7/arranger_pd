@@ -59,7 +59,7 @@ public:
     std::array<std::unique_ptr<AudioFileHandler>,8> samplePlayers;     
 
     ArrangerLogic arrangerLogic;
-    std::unique_ptr<PresetManager> presetManager;
+    std::shared_ptr<PresetManager> presetManager;
 
     MidiHandler midiHandler;
     

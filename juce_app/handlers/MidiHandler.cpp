@@ -1,24 +1,30 @@
 #include "MidiHandler.h"
+#include <memory>
 
-  void MidiHandler::logMidiMessages(const juce::MidiBuffer &midiMessages, PresetManager &manager) {
+  void MidiHandler::logMidiMessages(const juce::MidiBuffer &midiMessages, std::shared_ptr<PresetManager> manager) {
     for (const auto metadata : midiMessages) {
       const auto msg = metadata.getMessage();
       const auto samplePosition = metadata.samplePosition;
 
       if (msg.isProgramChange()) {
         int programNum = msg.getProgramChangeNumber();
-        juce::String presetName = manager.getPresetNameForMidiProgram(programNum);
+        juce::String presetName = manager->getPresetNameForMidiProgram(programNum);
 
         DBG("Program Change: Channel "
             << msg.getChannel() << " Program " << programNum << " -> Preset: "
             << (presetName.isNotEmpty() ? presetName : "<none>")
             << " at sample " << samplePosition);
 
-        juce::MessageManager::callAsync([presetManagerPtr = &manager, presetName, this]() {
-          presetManagerPtr->loadPreset(presetName);
+        std::weak_ptr<PresetManager> weakManager = manager;
 
-          if(repaintCallback)
-            repaintCallback();
+        juce::MessageManager::callAsync([weakManager, presetName, this]() {
+
+          if(auto managerPtr = weakManager.lock()) {
+
+            managerPtr->loadPreset(presetName);
+            if(repaintCallback) repaintCallback();
+
+          }
 
         });
 
