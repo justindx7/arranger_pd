@@ -1,5 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
+#include <mutex>
 #include "../handlers/AudioFileHandler.h"
 #include "../gui/SampleButton.h"
 #include "juce_core/system/juce_PlatformDefs.h"
@@ -58,8 +59,11 @@ private:
     void handleSectionStart();
 
   struct SectionInfo {
+    std::mutex barLocationsMutex;
+
     std::unique_ptr<AudioFileHandler> player; // Use unique_ptr
-    SampleButton* sampleButton = nullptr;
+                                              
+    juce::Component::SafePointer<SampleButton>sampleButton;
     ArrangerLogic* arrangerLogic = nullptr;
 
     std::unordered_set<double> barLocations;
@@ -74,12 +78,13 @@ private:
     ArrangerSection thisSection;
 
     void setSpeed (double speed) {
-       player->setPlaybackSpeed(speed);
+    if(player) player->setPlaybackSpeed(speed);
     }
 
     // TODO fix sample waiting 2 bars once next sample plays needs to be on every bar
     
     void calculate() {
+      std::lock_guard<std::mutex> lock(barLocationsMutex);
       barLocations.clear(); // Clear previous bar locations
                            
       if (arrangerLogic) {
@@ -185,7 +190,7 @@ private:
 
   };
 
-  std::map<ArrangerSection,SectionInfo> sections;
+  std::map<ArrangerSection,std::unique_ptr<SectionInfo>> sections;
   ArrangerSection currentSection = ArrangerSection::None;
   ArrangerSection nextSection = ArrangerSection::None;
   juce::MixerAudioSource mixer;
