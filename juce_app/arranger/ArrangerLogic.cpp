@@ -147,10 +147,9 @@ void ArrangerLogic::stop() {
 
   for (auto &[section, info] : sections) {
     if (info.sampleButton) {
-      juce::MessageManager::callAsync([buttonPtr = info.sampleButton] {
-        if (buttonPtr)
-        buttonPtr->setColour(juce::TextButton::buttonColourId,
-                             juce::Colours::darkblue);
+      juce::MessageManager::callAsync([safeButton = juce::Component::SafePointer<SampleButton>(info.sampleButton)] {
+        if (safeButton) 
+             safeButton->setColour(juce::TextButton::buttonColourId,juce::Colours::darkblue);
       });
     }
   }

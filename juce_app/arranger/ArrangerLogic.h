@@ -110,11 +110,11 @@ private:
     isPlaying = true;
     player->playSample();
 
-    juce::MessageManager::callAsync([buttonPtr = sampleButton] {
-      if (buttonPtr) {
-        buttonPtr->setPlayingState(true);
-        buttonPtr->setColour(juce::TextButton::buttonColourId,
-                             juce::Colours::darkblue);
+    juce::MessageManager::callAsync([safeButton = juce::Component::SafePointer<SampleButton>(sampleButton)] {
+        if (safeButton) {
+          safeButton->setPlayingState(true);
+          safeButton->setColour(juce::TextButton::buttonColourId,
+                                juce::Colours::darkblue);
       }
     });
 
@@ -125,14 +125,15 @@ private:
 
     void stop() {
       isPlaying = false;
+
       player->stopSample();
 
       if(isLoop)
         player->loadSample();
 
-      juce::MessageManager::callAsync([buttonPtr = sampleButton] {
-        if (buttonPtr)
-          buttonPtr->setPlayingState(false);
+      juce::MessageManager::callAsync([safeButton = juce::Component::SafePointer<SampleButton>(sampleButton)] {
+        if (safeButton)
+            safeButton->setPlayingState(false);
       });
     }
 
