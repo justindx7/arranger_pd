@@ -2,50 +2,75 @@
 #include <JuceHeader.h>
 #include "../CustomStandaloneFilterWindow.h"
 
-class OptionsPanel : public juce::Component {
+
+// OptionsPanel.h additions
+class OptionsPanel : public juce::Component
+{
 public:
-    OptionsPanel(juce::AudioProcessorValueTreeState& ref, std::function<void()> onClose);
-
-    void paint(juce::Graphics&) override;
+    OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::function<void()> onClose);
+    void paint(juce::Graphics& g) override;
     void resized() override;
+
 private:
-    juce::AudioProcessorValueTreeState& Reference;
+    enum class Page {
+        TEMPO_REVERB = 0,
+        VOLUME_CONTROLS = 1,
+        SAMPLE_VOLUMES = 2,
+        AUDIO_SETTINGS = 3,
+        TOTAL_PAGES = 4
+    };
+
+    Page currentPage = Page::TEMPO_REVERB;
+    
+    // Navigation
+    juce::TextButton prevButton {"<"};
+    juce::TextButton nextButton {">"};
+    juce::Label pageLabel;
+    
+    // Existing members...
+    juce::AudioProcessorValueTreeState &Reference;
     std::function<void()> onCloseCallback;
-    juce::TextButton closeButton;
-
-    juce::Slider bpmSlider;
+    juce::TextButton closeButton {"Close"};
+    
+    // Page 1: Tempo & Reverb
     juce::Label bpmLabel;
+    juce::Slider bpmSlider;
+    juce::TextButton bpmMinusButton {"-"};
+    juce::TextButton bpmPlusButton {"+"};
     juce::Label bpmValueLabel;
-    juce::TextButton bpmMinusButton { "-" };
-    juce::TextButton bpmPlusButton { "+" };
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> bpmAttachment;
-
-    // --- Added for Room Size, Damping, Width ---
-    juce::Slider roomSizeSlider;
+    
     juce::Label roomSizeLabel;
+    juce::Slider roomSizeSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> roomSizeAttachment;
-
-    juce::Slider dampingSlider;
+    
     juce::Label dampingLabel;
+    juce::Slider dampingSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dampingAttachment;
-
-    juce::Slider widthSlider;
+    
     juce::Label widthLabel;
+    juce::Slider widthSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
-
-    // --- Highpass Frequency Slider ---
-    juce::Slider highpassSlider;
+    
+    // Page 2: Volume Controls
     juce::Label highpassLabel;
+    juce::Slider highpassSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> highpassAttachment;
-
-    // Arranger section kit gain
-    juce::Slider gainSlider;
+    
     juce::Label gainLabel;
+    juce::Slider gainSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
-
+    
+    // Page 3: Sample Volumes
     juce::Label gainSampleLabels[8];
     juce::Slider gainSampleSliders[8];
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSampleAttachments[8];
-
+    
+    // Page 4: Audio Settings
     juce::TextButton audioSettingsButton {"Audio Settings"};
+    juce::Label audioSettingsLabel;
+    
+    void updatePageVisibility();
+    void switchToPage(Page newPage);
+    juce::String getPageTitle() const;
 };
