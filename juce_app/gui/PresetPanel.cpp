@@ -301,7 +301,27 @@ void PresetPanel::openSaveDialog()
     saveAlertWindow->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey, 0, 0));
     saveAlertWindow->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey, 0, 0));
 
-    auto callback = juce::ModalCallbackFunction::create([saveAlertWindow, this](int result) {
+    auto assignNextMidi = [this](const juce::String& fileName)
+    {
+        std::set<std::pair<int, int>> used;
+        for (const auto& kv : manager.getMidiProgramAssignments())
+            used.insert(kv.second);
+
+        bool assigned = false;
+        for (int ch = 1; ch < 16 && !assigned; ++ch)
+        {
+            for (int pg = 0; pg < 128 && !assigned; ++pg)
+            {
+                if (used.find({pg, ch}) == used.end())
+                {
+                    manager.assignMidiProgram(fileName, pg, ch);
+                    assigned = true;
+                }
+            }
+        }
+    };
+
+    auto callback = juce::ModalCallbackFunction::create([saveAlertWindow, this, assignNextMidi](int result) {
         if (result == 1) {
             auto userInput = saveAlertWindow->getTextEditorContents("text");
             auto fileName = juce::File::createLegalFileName(userInput);
@@ -309,6 +329,12 @@ void PresetPanel::openSaveDialog()
             // Check if preset already exists
             auto allPresets = manager.getAllPresets();
             bool exists = std::find(allPresets.begin(), allPresets.end(), fileName) != allPresets.end();
+
+            auto doSave = [this, fileName]() {
+                manager.savePreset(fileName);
+                openCategoryDialog(fileName);
+                refreshPresetList();
+            };
 
             if (exists)
             {
@@ -319,20 +345,17 @@ void PresetPanel::openSaveDialog()
                     "Overwrite",
                     "Cancel",
                     nullptr,
-                    juce::ModalCallbackFunction::create([this, fileName](int overwriteResult) {
+                    juce::ModalCallbackFunction::create([doSave](int overwriteResult) {
                         if (overwriteResult == 1) {
-                            manager.savePreset(fileName);
-                            openCategoryDialog(fileName);
-                            refreshPresetList();
+                            doSave(); // Only save and refresh, do NOT assign MIDI
                         }
                     })
                 );
             }
             else
             {
-                manager.savePreset(fileName);
-                openCategoryDialog(fileName);
-                refreshPresetList();
+                doSave();
+                assignNextMidi(fileName); // Only assign MIDI for new presets
             }
         }
     });
