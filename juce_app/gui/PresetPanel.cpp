@@ -301,13 +301,39 @@ void PresetPanel::openSaveDialog()
     saveAlertWindow->addButton("OK", 1, juce::KeyPress(juce::KeyPress::returnKey, 0, 0));
     saveAlertWindow->addButton("Cancel", 0, juce::KeyPress(juce::KeyPress::escapeKey, 0, 0));
 
-    auto callback = juce::ModalCallbackFunction::create([saveAlertWindow,this] (int result) {
-        if(result == 1){
+    auto callback = juce::ModalCallbackFunction::create([saveAlertWindow, this](int result) {
+        if (result == 1) {
             auto userInput = saveAlertWindow->getTextEditorContents("text");
             auto fileName = juce::File::createLegalFileName(userInput);
-            manager.savePreset(fileName);
-            openCategoryDialog(fileName);
-            refreshPresetList();
+
+            // Check if preset already exists
+            auto allPresets = manager.getAllPresets();
+            bool exists = std::find(allPresets.begin(), allPresets.end(), fileName) != allPresets.end();
+
+            if (exists)
+            {
+                juce::AlertWindow::showOkCancelBox(
+                    juce::AlertWindow::WarningIcon,
+                    "Preset Exists",
+                    "A preset with this name already exists. Do you want to overwrite it?",
+                    "Overwrite",
+                    "Cancel",
+                    nullptr,
+                    juce::ModalCallbackFunction::create([this, fileName](int overwriteResult) {
+                        if (overwriteResult == 1) {
+                            manager.savePreset(fileName);
+                            openCategoryDialog(fileName);
+                            refreshPresetList();
+                        }
+                    })
+                );
+            }
+            else
+            {
+                manager.savePreset(fileName);
+                openCategoryDialog(fileName);
+                refreshPresetList();
+            }
         }
     });
     saveAlertWindow->enterModalState(true, callback, false);
