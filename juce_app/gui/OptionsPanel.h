@@ -43,5 +43,9 @@ private:
     juce::Label gainLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
 
+    juce::Label gainSampleLabels[8];
+    juce::Slider gainSampleSliders[8];
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSampleAttachments[8];
+
     juce::TextButton audioSettingsButton {"Audio Settings"};
 };

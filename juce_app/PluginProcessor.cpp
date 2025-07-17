@@ -36,6 +36,15 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
 
     gainParameter = parameters.getRawParameterValue("uGain");
 
+    gain1Parameter = parameters.getRawParameterValue("uGain1");
+    gain2Parameter = parameters.getRawParameterValue("uGain2");
+    gain3Parameter = parameters.getRawParameterValue("uGain3");
+    gain4Parameter = parameters.getRawParameterValue("uGain4");
+    gain5Parameter = parameters.getRawParameterValue("uGain5");
+    gain6Parameter = parameters.getRawParameterValue("uGain6");
+    gain7Parameter = parameters.getRawParameterValue("uGain7");
+    gain8Parameter = parameters.getRawParameterValue("uGain8");
+
     parameters.state.setProperty(PresetManager::presetNameProperty, "", nullptr);
     parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
     presetManager = std::make_unique<PresetManager>(parameters);
@@ -210,6 +219,17 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     arrangerLogic.setStretch(stretchParameter->load());
     arrangerLogic.update();
     arrangerLogic.getMixer().getNextAudioBlock(juce::AudioSourceChannelInfo(buffer));
+
+    // sampleButtons setGain
+    samplePlayers[0]->setGain(juce::Decibels::decibelsToGain(gain1Parameter->load()));
+    samplePlayers[1]->setGain(juce::Decibels::decibelsToGain(gain2Parameter->load()));
+    samplePlayers[2]->setGain(juce::Decibels::decibelsToGain(gain3Parameter->load()));
+    samplePlayers[3]->setGain(juce::Decibels::decibelsToGain(gain4Parameter->load()));
+    samplePlayers[4]->setGain(juce::Decibels::decibelsToGain(gain5Parameter->load()));
+    samplePlayers[5]->setGain(juce::Decibels::decibelsToGain(gain6Parameter->load()));
+    samplePlayers[6]->setGain(juce::Decibels::decibelsToGain(gain7Parameter->load()));
+    samplePlayers[7]->setGain(juce::Decibels::decibelsToGain(gain8Parameter->load()));
+    
 
     highPass.setCutoffFrequency(highpassFreqParameter->load()); 
 

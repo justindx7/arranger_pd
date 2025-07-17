@@ -80,6 +80,23 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     gainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         Reference, "uGain", gainSlider);
 
+    // Gain sliders for samples 1–8
+    for (int i = 0; i < 8; ++i) {
+      auto name = "Sample" + std::to_string(i + 1) + " Volume";
+      auto paramID = "uGain" + std::to_string(i + 1);
+
+      gainSampleLabels[i].setText(name, juce::dontSendNotification);
+      addAndMakeVisible(gainSampleLabels[i]);
+
+      gainSampleSliders[i].setSliderStyle(juce::Slider::LinearHorizontal);
+      gainSampleSliders[i].setTextValueSuffix(" dB");
+      addAndMakeVisible(gainSampleSliders[i]);
+
+      gainSampleAttachments[i] = std::make_unique<
+          juce::AudioProcessorValueTreeState::SliderAttachment>(
+          Reference, paramID, gainSampleSliders[i]);
+    }
+
     // Audio settings button
     addAndMakeVisible(audioSettingsButton);
     audioSettingsButton.onClick = []() {
@@ -120,7 +137,13 @@ void OptionsPanel::resized() {
     gainLabel.setBounds(40, sliderY + 250, 120, 30);
     gainSlider.setBounds(160, sliderY + 250, getWidth() - 200, sliderH);
 
-    audioSettingsButton.setBounds(40, sliderY + 400, w*2, h);
+    int gainY = sliderY + 300;
+    for (int i = 0; i < 8; ++i){
+    gainSampleLabels[i].setBounds(40, gainY + i * 50, 120, 30);
+    gainSampleSliders[i].setBounds(160, gainY + i * 50, getWidth() - 200, 40);
+    }
+
+    audioSettingsButton.setBounds(40, gainY + 8 * 50 + 20, w * 2, h);
 
     closeButton.setBounds(getWidth() - 120, 10, 100, 50);
 }
