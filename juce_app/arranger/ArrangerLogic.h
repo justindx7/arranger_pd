@@ -14,8 +14,11 @@ public:
 
     void prepareToPlay(double sampleRate, int bufferSize);
 
+    void setGain(float newGain);
+
     void releaseSources();
     void handleColours();
+    
 
     void update();
 

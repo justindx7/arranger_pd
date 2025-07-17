@@ -70,12 +70,20 @@ OptionsPanel::OptionsPanel(juce::AudioProcessorValueTreeState &ref, std::functio
     highpassAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
         Reference, "uHighpassFreq", highpassSlider);
 
+    // Arranger section kit gain
+    //
+    gainLabel.setText("Arranger Volume", juce::dontSendNotification);
+    addAndMakeVisible(gainLabel);
+    gainSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    gainSlider.setTextValueSuffix(" dB");
+    addAndMakeVisible(gainSlider);
+    gainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
+        Reference, "uGain", gainSlider);
+
     // Audio settings button
     addAndMakeVisible(audioSettingsButton);
     audioSettingsButton.onClick = []() {
-
     juce::StandalonePluginHolder::getInstance()->showAudioSettingsDialog();
-
     };
 }
 
@@ -109,7 +117,10 @@ void OptionsPanel::resized() {
     highpassLabel.setBounds(40, sliderY + 150, 120, 30);
     highpassSlider.setBounds(160, sliderY + 150, getWidth() - 200, sliderH);
 
-    audioSettingsButton.setBounds(40, sliderY + 250, w*2, h);
+    gainLabel.setBounds(40, sliderY + 250, 120, 30);
+    gainSlider.setBounds(160, sliderY + 250, getWidth() - 200, sliderH);
+
+    audioSettingsButton.setBounds(40, sliderY + 400, w*2, h);
 
     closeButton.setBounds(getWidth() - 120, 10, 100, 50);
 }

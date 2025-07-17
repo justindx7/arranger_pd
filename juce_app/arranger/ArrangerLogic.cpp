@@ -102,6 +102,7 @@ void ArrangerLogic::prepareToPlay(double sampleRate, int bufferSize) {
   mixer.removeAllInputs();
   mixer.prepareToPlay(bufferSize, sampleRate);
 
+
   for (auto &[section, info] : sections) {
     if (info->player) {
       info->player->prepareToPlay(sampleRate, bufferSize);
@@ -124,6 +125,14 @@ void ArrangerLogic::setBPM(double newBPM) {
       info->calculate();
     }
   }
+}
+
+void ArrangerLogic::setGain(float newGain) {
+  for (auto &[section, info] : sections) {
+    if (info->player) {
+        info->player->setGain(newGain);
+        }
+    }
 }
 
 void ArrangerLogic::setStretch(double newBPMOffset) {

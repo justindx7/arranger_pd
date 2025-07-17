@@ -304,6 +304,8 @@ void PresetPanel::openSaveDialog()
     auto assignNextMidi = [this](const juce::String& fileName)
     {
         std::set<std::pair<int, int>> used;
+
+        // get program channel pairs that are saved and insert those in the set so their marked as used
         for (const auto& kv : manager.getMidiProgramAssignments())
             used.insert(kv.second);
 

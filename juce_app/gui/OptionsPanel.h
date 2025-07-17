@@ -38,5 +38,10 @@ private:
     juce::Label highpassLabel;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> highpassAttachment;
 
+    // Arranger section kit gain
+    juce::Slider gainSlider;
+    juce::Label gainLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainAttachment;
+
     juce::TextButton audioSettingsButton {"Audio Settings"};
 };

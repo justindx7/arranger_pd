@@ -65,7 +65,7 @@ public:
     
     juce::AudioProcessorValueTreeState parameters;
 
-    static constexpr int numParameters = 7; 
+    static constexpr int numParameters = 8; 
 
     std::atomic<float>* bpmParameter = nullptr;
     std::atomic<float>* stretchParameter = nullptr;
@@ -75,6 +75,7 @@ public:
     std::atomic<float>* dampingParameter = nullptr;
     std::atomic<float>* widthParameter = nullptr;
     std::atomic<float>* highpassFreqParameter = nullptr; 
+    std::atomic<float>* gainParameter = nullptr; 
 
     juce::NormalisableRange<float> bpmRange = {20.0f, 200.0f, 1.0f};
     juce::NormalisableRange<float> stretchRange = {-10.0f, 10.0f, 1.0f};
@@ -83,15 +84,17 @@ public:
     juce::NormalisableRange<float> dampingRange = {0.0f, 100.0f, 1.0f};
     juce::NormalisableRange<float> widthRange = {0.0f, 100.0f, 1.0f};
     juce::NormalisableRange<float> highpassFreqRange = {20.0f, 20000.0f, 1.0f}; 
+    juce::NormalisableRange<float> gainRange = {-24.0f, 6.0f, 0.1f}; 
 
-    float startingValues[numParameters] = {100.f, 0.f, 0.f, 50.f, 50.0f, 100.0f, 20.0f};
+
+    float startingValues[numParameters] = {100.f, 0.f, 0.f, 50.f, 50.0f, 100.0f, 20.0f, 0.0f};
 
     juce::NormalisableRange<float> normalisableRanges[numParameters] = {
-      bpmRange, stretchRange, drywetRange, roomSizeRange, dampingRange, widthRange, highpassFreqRange 
+      bpmRange, stretchRange, drywetRange, roomSizeRange, dampingRange, widthRange, highpassFreqRange, gainRange
     };
 
     std::string parameterNames[numParameters] = {
-      "BPM", "Stretch", "Reverb", "RoomSize", "Damping", "Width", "HighpassFreq" 
+      "BPM", "Stretch", "Reverb", "RoomSize", "Damping", "Width", "HighpassFreq", "Gain" 
     };
 
     juce::ParameterID bpmParam{"uBPM", 1};
@@ -101,9 +104,10 @@ public:
     juce::ParameterID dampingParam{"uDamping", 1};
     juce::ParameterID widthParam{"uWidth", 1};
     juce::ParameterID highpassFreqParam{"uHighpassFreq", 1}; 
+    juce::ParameterID gainParam{"uGain", 1}; 
 
     juce::ParameterID parameterIDs[numParameters] = {
-      bpmParam, stretchParam, drywetParam, roomSizeParam, dampingParam, widthParam, highpassFreqParam 
+      bpmParam, stretchParam, drywetParam, roomSizeParam, dampingParam, widthParam, highpassFreqParam, gainParam
     };
 
     juce::dsp::Reverb reverb;
@@ -123,8 +127,6 @@ public:
     float wetMix = 0.0f;
 
     juce::dsp::Limiter<float> limiter;
-
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

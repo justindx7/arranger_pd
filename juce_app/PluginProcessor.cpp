@@ -1,5 +1,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "juce_audio_basics/juce_audio_basics.h"
 #include "service/PresetManager.h"
 #include <memory>
 
@@ -32,6 +33,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     dampingParameter = parameters.getRawParameterValue("uDamping");
     widthParameter = parameters.getRawParameterValue("uWidth");
     highpassFreqParameter = parameters.getRawParameterValue("uHighpassFreq");
+
+    gainParameter = parameters.getRawParameterValue("uGain");
 
     parameters.state.setProperty(PresetManager::presetNameProperty, "", nullptr);
     parameters.state.setProperty("version", ProjectInfo::versionString, nullptr);
@@ -202,6 +205,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    arrangerLogic.setGain(juce::Decibels::decibelsToGain(gainParameter->load()));
     arrangerLogic.setBPM(bpmParameter->load());
     arrangerLogic.setStretch(stretchParameter->load());
     arrangerLogic.update();
