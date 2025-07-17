@@ -15,9 +15,8 @@ private:
     enum class Page {
         TEMPO_REVERB = 0,
         VOLUME_CONTROLS = 1,
-        SAMPLE_VOLUMES = 2,
-        AUDIO_SETTINGS = 3,
-        TOTAL_PAGES = 4
+        AUDIO_SETTINGS = 2,
+        TOTAL_PAGES = 3
     };
 
     Page currentPage = Page::TEMPO_REVERB;

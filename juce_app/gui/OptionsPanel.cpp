@@ -168,16 +168,13 @@ void OptionsPanel::updatePageVisibility() {
             dampingSlider.setVisible(true);
             widthLabel.setVisible(true);
             widthSlider.setVisible(true);
+            highpassLabel.setVisible(true);
+            highpassSlider.setVisible(true);
             break;
             
         case Page::VOLUME_CONTROLS:
-            highpassLabel.setVisible(true);
-            highpassSlider.setVisible(true);
             gainLabel.setVisible(true);
             gainSlider.setVisible(true);
-            break;
-            
-        case Page::SAMPLE_VOLUMES:
             for (int i = 0; i < 8; ++i) {
                 gainSampleLabels[i].setVisible(true);
                 gainSampleSliders[i].setVisible(true);
@@ -204,10 +201,9 @@ void OptionsPanel::switchToPage(Page newPage) {
 
 juce::String OptionsPanel::getPageTitle() const {
     switch (currentPage) {
-        case Page::TEMPO_REVERB: return "Tempo & Reverb (1/4)";
-        case Page::VOLUME_CONTROLS: return "Volume Controls (2/4)";
-        case Page::SAMPLE_VOLUMES: return "Sample Volumes (3/4)";
-        case Page::AUDIO_SETTINGS: return "Audio Settings (4/4)";
+        case Page::TEMPO_REVERB: return "Tempo & Reverb (1/3)";
+        case Page::VOLUME_CONTROLS: return "Volume Controls (2/3)";
+        case Page::AUDIO_SETTINGS: return "Audio Settings (3/3)";
         default: return "Options";
     }
 }
@@ -263,24 +259,21 @@ void OptionsPanel::resized() {
             
             widthLabel.setBounds(margin, reverbY + 100, 120, labelHeight);
             widthSlider.setBounds(margin + 140, reverbY + 100, sliderWidth, sliderHeight);
+
+            highpassLabel.setBounds(margin, reverbY + 150, 120, labelHeight);
+            highpassSlider.setBounds(margin + 140, reverbY + 150, sliderWidth, sliderHeight);
+
             break;
         }
         
         case Page::VOLUME_CONTROLS: {
             int y = contentY;
             
-            highpassLabel.setBounds(margin, y, 120, labelHeight);
-            highpassSlider.setBounds(margin + 140, y, sliderWidth, sliderHeight);
+            gainLabel.setBounds(margin, y, 120, labelHeight);
+            gainSlider.setBounds(margin + 140, y, sliderWidth, sliderHeight);
             
-            gainLabel.setBounds(margin, y + 70, 120, labelHeight);
-            gainSlider.setBounds(margin + 140, y + 70, sliderWidth, sliderHeight);
-            break;
-        }
-        
-        case Page::SAMPLE_VOLUMES: {
-            int y = contentY;
+            y = y + 70;
             int itemHeight = 50;
-            
             for (int i = 0; i < 8; ++i) {
                 gainSampleLabels[i].setBounds(margin, y + i * itemHeight, 140, labelHeight);
                 gainSampleSliders[i].setBounds(margin + 150, y + i * itemHeight, sliderWidth - 10, sliderHeight);
