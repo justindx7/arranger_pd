@@ -67,6 +67,9 @@ target_compile_definitions(Arranger
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
         JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1
+        JUCE_USE_FLAC=1          
+        JUCE_USE_OGGVORBIS=1     
+        JUCE_USE_MP3AUDIOFORMAT=1 
 )
 
 target_link_libraries(Arranger
