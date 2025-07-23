@@ -131,6 +131,7 @@ void SampleButton::setPlayingState(bool playing) {
     } else {
         stopFlashing();
     }
+
   }
 }
 
@@ -189,6 +190,11 @@ if(selectedFilePath != newFile) {
 void SampleButton::timerCallback() {
     flashOn = !flashOn;
     repaint();
+
+    if(selectedFilePath.isEmpty()) {
+        isPlaying = false;
+        stopFlashing();
+    }
 }
 
 void SampleButton::startFlashing() {
@@ -202,6 +208,7 @@ void SampleButton::startFlashing() {
     } else if (isPlaying) {
       startTimer(600); 
     }
+
 }
 
 void SampleButton::stopFlashing() {
@@ -242,6 +249,7 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     
     // Skip if no file
     if (selectedFilePath.isEmpty() && !editMode) {
+        //setPlayingState(false);
         g.setColour(juce::Colours::darkgrey); // Solid color = faster
         g.fillRect(bounds);
         g.setColour(juce::Colours::lightgrey);
