@@ -259,7 +259,7 @@ void SampleButton::paintButton(juce::Graphics& g, bool isMouseOverButton, bool i
     } else if (editMode) {
       g.setColour(juce::Colours::white); // Solid white, no alpha
       g.fillRect(bounds);
-      g.setColour (juce::Colours::black);
+      g.setColour ( (selectedFilePath.isEmpty()) ? juce::Colours::black : juce::Colours::fuchsia);
       g.setFont (20.0f);
       g.drawFittedText (getButtonText(), getLocalBounds(), juce::Justification::centred, 1);
     }
