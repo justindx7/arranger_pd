@@ -45,7 +45,6 @@ void ArrangerLogic::update() {
             pos = cur->player->getCurrentPosition() * 1000;
         }
 
-        // Use a tolerance to check if pos is close to any bar location
         bool found = false;
 
         double prevPos = cur->lastCheckedPosition;

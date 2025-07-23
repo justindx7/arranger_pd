@@ -64,7 +64,7 @@ private:
   struct SectionInfo {
     std::mutex barLocationsMutex;
 
-    std::unique_ptr<AudioFileHandler> player; // Use unique_ptr
+    std::unique_ptr<AudioFileHandler> player; 
                                               
     juce::Component::SafePointer<SampleButton>sampleButton;
     ArrangerLogic* arrangerLogic = nullptr;
@@ -84,11 +84,11 @@ private:
     if(player) player->setPlaybackSpeed(speed);
     }
 
-    // TODO fix sample waiting 2 bars once next sample plays needs to be on every bar
     
     void calculate() {
       std::lock_guard<std::mutex> lock(barLocationsMutex);
-      barLocations.clear(); // Clear previous bar locations
+      // Clear previous bar locations
+      barLocations.clear(); 
                            
       if (arrangerLogic) {
         double beatLengthMS = 60000 / arrangerLogic->BPM;

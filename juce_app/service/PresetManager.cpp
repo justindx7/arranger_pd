@@ -169,6 +169,8 @@ void PresetManager::assignMidiProgram(const juce::String &presetName, int midiPr
 }
 
 void PresetManager::removeMidiProgram(const juce::String &presetName) {
+    // inserts 0 if presetName doesnt exist but then removes it
+    // might be cleaner to use at() and catch if the presetName doesnt exist
     auto pair = midiProgramAssignments[presetName];
     midiProgramAssignments.erase(presetName);
     midiProgramToPreset.erase(pair);
