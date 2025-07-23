@@ -163,6 +163,8 @@ void PresetManager::valueTreeRedirected(juce::ValueTree &treeWhichHasBeenChanged
 }
 
 void PresetManager::assignMidiProgram(const juce::String &presetName, int midiProgram, int midiChannel) {
+    removeMidiProgram(presetName);
+    
     midiProgramAssignments.insert_or_assign(presetName, std::make_pair(midiProgram, midiChannel));
     midiProgramToPreset.insert_or_assign(std::make_pair(midiProgram, midiChannel), presetName);
     saveMidiAssignments();
