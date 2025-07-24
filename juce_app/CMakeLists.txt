@@ -22,6 +22,9 @@ if(JUCE_VERSION)
     message("JUCE version: ${JUCE_VERSION}")
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
+set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=address")
+
 # Debug: List all available targets
 get_property(imported_targets DIRECTORY PROPERTY IMPORTED_TARGETS)
 message("Available imported targets: ${imported_targets}")

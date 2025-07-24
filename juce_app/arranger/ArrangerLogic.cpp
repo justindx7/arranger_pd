@@ -24,7 +24,6 @@ void ArrangerLogic::handleSectionEnd(ArrangerLogic::ArrangerSection next) {
 
 
 void ArrangerLogic::handleSectionStart() {
-
     sections[currentSection]->stop();
     currentSection = nextSection;
 
@@ -34,16 +33,23 @@ void ArrangerLogic::handleSectionStart() {
 }
 
 void ArrangerLogic::update() {
+    std::lock_guard<std::mutex> lock(sectionMutex);
 
-// crossed a bar checking
+    if (!sectionChangePending)
+        return;
 
-    if(sectionChangePending) {
-        auto &cur = sections[currentSection];
-        double pos = 0;
-        if(cur->player) {
-            // get current play position and convert to MS
-            pos = cur->player->getCurrentPosition() * 1000;
-        }
+    if (currentSection == ArrangerSection::None)
+        return;
+
+    auto it = sections.find(currentSection);
+    if (it == sections.end() || !it->second || !it->second->player)
+        return;
+
+    auto& cur = it->second;
+
+        // get current play position and convert to MS
+       double pos = cur->player->getCurrentPosition() * 1000;
+    
 
         bool found = false;
 
@@ -61,7 +67,6 @@ void ArrangerLogic::update() {
         if(found) {
             handleSectionStart();
         }
-    }
 }
 
 
@@ -148,19 +153,26 @@ void ArrangerLogic::setStretch(double newBPMOffset) {
 }
 
 void ArrangerLogic::stop() {
-  if (currentSection != ArrangerSection::None) {
-    sections[currentSection]->stop();
-    currentSection = ArrangerSection::None;
-  }
+    std::lock_guard<std::mutex> lock(sectionMutex);
 
-  for (auto &[section, info] : sections) {
-    if (info->sampleButton) {
-      juce::MessageManager::callAsync([safeButton = juce::Component::SafePointer<SampleButton>(info->sampleButton)] {
-        if (safeButton) 
-             safeButton->setColour(juce::TextButton::buttonColourId,juce::Colours::darkblue);
-      });
+    if (currentSection != ArrangerSection::None) {
+        auto it = sections.find(currentSection);
+        if (it != sections.end() && it->second)
+            it->second->stop();
+
+        currentSection = ArrangerSection::None;
     }
-  }
+
+    sectionChangePending = false;
+
+    for (auto &[section, info] : sections) {
+        if (info->sampleButton) {
+            juce::MessageManager::callAsync([safeButton = juce::Component::SafePointer<SampleButton>(info->sampleButton)] {
+                if (safeButton)
+                    safeButton->setColour(juce::TextButton::buttonColourId, juce::Colours::darkblue);
+            });
+        }
+    }
 }
 
 void ArrangerLogic::handleColours() {

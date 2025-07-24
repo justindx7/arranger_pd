@@ -5,3 +5,4 @@
 /juce_app/.cache
 /juce_app/out
 /juce_app/compile_commands.json
+/juce_app/asanBuild

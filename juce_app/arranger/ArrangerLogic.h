@@ -60,6 +60,7 @@ private:
 
     void handleSectionEnd(ArrangerLogic::ArrangerSection next);
     void handleSectionStart();
+    std::mutex sectionMutex;
 
   struct SectionInfo {
     std::mutex barLocationsMutex;
@@ -134,7 +135,8 @@ private:
     void stop() {
       isPlaying = false;
 
-      player->stopSample();
+      if(player)
+        player->stopSample();
 
       if(isLoop)
         player->loadSample();
