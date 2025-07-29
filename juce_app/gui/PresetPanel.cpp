@@ -29,7 +29,10 @@ PresetPanel::PresetPanel(PresetManager& presetManager, std::function<void()> onC
 
     addAndMakeVisible(categoryFilterButton);
     categoryFilterButton.setButtonText("All");
-    categoryFilterButton.onClick = [this] { showCategoryMenu(); };
+    categoryFilterButton.setMouseClickGrabsKeyboardFocus(true);
+    categoryFilterButton.setWantsKeyboardFocus(true);
+
+    categoryFilterButton.onClick = [this] { cycleCategoryFilter(); };
 
 }
 

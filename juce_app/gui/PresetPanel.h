@@ -46,15 +46,12 @@ private:
        "Ballad", "Disco", "Hiphop", "House", "Orchestral",
        "Pop",    "Latin", "Reggae", "Rock",  "Waltz"};
 
+// currently not used but still here to maybe implement
    void showCategoryMenu() {
      juce::PopupMenu menu;
-
      // Add "All" option
      menu.addItem(1, "All", true, filterCategory == "All");
-
-     // Add separator
      menu.addSeparator();
-
      // Add categories
      int itemId = 2;
      for (const auto &cat : presetCategories) {
@@ -62,7 +59,6 @@ private:
        itemId++;
      }
 
-     // Show menu and handle selection
      menu.showMenuAsync(
          juce::PopupMenu::Options()
              .withTargetComponent(&categoryFilterButton)
@@ -75,7 +71,6 @@ private:
              filterCategory = "All";
              categoryFilterButton.setButtonText("All");
            } else {
-             // Find the selected category
              int categoryIndex = result - 2;
              if (categoryIndex >= 0 &&
                  categoryIndex < presetCategories.size()) {
@@ -86,5 +81,19 @@ private:
 
            refreshPresetList();
          });
+   }
+
+   void cycleCategoryFilter() {
+     juce::StringArray allOptions;
+     allOptions.add("All");
+     for (const auto &cat : presetCategories)
+       allOptions.add(cat);
+
+     int currentIndex = allOptions.indexOf(filterCategory);
+     int nextIndex = (currentIndex + 1) % allOptions.size();
+
+     filterCategory = allOptions[nextIndex];
+     categoryFilterButton.setButtonText(filterCategory);
+     refreshPresetList();
    }
 };
