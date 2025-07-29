@@ -25,18 +25,12 @@ PresetPanel::PresetPanel(PresetManager& presetManager, std::function<void()> onC
 
     refreshPresetList();
 
-    addAndMakeVisible(categoryFilterBox);
-    categoryFilterBox.addItem("All", 1);
-    for (const auto &cat : presetCategories)
-      categoryFilterBox.addItem(cat, categoryFilterBox.getNumItems() + 1);
 
-    categoryFilterBox.setSelectedId(1);
 
-    categoryFilterBox.onChange = [this] {
-      filterCategory = categoryFilterBox.getText();
-      refreshPresetList();
+    addAndMakeVisible(categoryFilterButton);
+    categoryFilterButton.setButtonText("All");
+    categoryFilterButton.onClick = [this] { showCategoryMenu(); };
 
-    };
 }
 
 void PresetPanel::refreshPresetList()
@@ -108,12 +102,12 @@ void PresetPanel::paint(juce::Graphics& g)
             int midiNum = it->second.first;
             int midiChan = it->second.second;
 
-            displayText += "   [MIDI: PG: " + juce::String(midiNum) +
-                           " CH: " + juce::String(midiChan) + "]";
+            displayText += "   [MIDI: PG: " + juce::String(midiNum) + " [" + juce::String(midiNum + 1) +
+                           "]  CH: " + juce::String(midiChan) + "]";
           }
         }
 
-        if (categoryFilterBox.getText() == "All")
+        if (filterCategory == "All")
         {
           juce::String presetCategory = manager.getPresetCategory(presets[i]);
           if (presetCategory != "") {
@@ -186,7 +180,7 @@ void PresetPanel::resized()
     prevPageButton.setBounds(20, getHeight() - 70, 60, 50);
     nextPageButton.setBounds(getWidth() - 80, getHeight() - 70, 60, 50);
 
-    categoryFilterBox.setBounds(getWidth()  - 340, 10, 160, btnH                     );
+    categoryFilterButton.setBounds(getWidth()  - 340, 10, 160, btnH                     );
 }
 
 void PresetPanel::mouseUp(const juce::MouseEvent& e)
