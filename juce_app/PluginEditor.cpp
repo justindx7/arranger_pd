@@ -189,15 +189,31 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (20.0f);
+
+
+    juce::String displayPresetInfo = "";
     juce::String currentPreset = processorRef.getPresetManager().getCurrentPreset();
-    g.drawFittedText (currentPreset, getLocalBounds(), juce::Justification::topLeft, 1);
+    displayPresetInfo += currentPreset;
 
-    tempoSlider.onValueChange();
-    reverbSlider.onValueChange();
-    //color for easy debugging
-    // g.fillRect(tempoSlider.getBounds().toFloat().reduced(2.0f));
+    if (processorRef.getPresetManager().getMidiProgramAssignments().contains(currentPreset)) {
 
-}
+      const auto &assignments = processorRef.getPresetManager().getMidiProgramAssignments();
+      auto it = assignments.find(currentPreset);
+      if (it != assignments.end()) {
+        int midiNum = it->second.first;
+        int midiChan = it->second.second;
+        // number + 1 to make the program numbers align when program 1 is pressed on synth program 0 gets send
+        displayPresetInfo += " [" + juce::String(midiNum + 1) + "," + juce::String(midiChan) + "]";
+      }
+    }
+      g.drawFittedText(displayPresetInfo, getLocalBounds(),
+                       juce::Justification::topLeft, 1);
+
+      tempoSlider.onValueChange();
+      reverbSlider.onValueChange();
+      // color for easy debugging
+      //  g.fillRect(tempoSlider.getBounds().toFloat().reduced(2.0f));
+    }
 
 void AudioPluginAudioProcessorEditor::resized()
 {
