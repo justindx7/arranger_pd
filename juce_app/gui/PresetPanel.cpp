@@ -228,6 +228,7 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
                 [this, presetName = presets[i]](int midiNum, int midiChan) {
 
                     // Only assign if this midiNum is not already assigned to another preset
+                    juce::StringRef alreadyAssignedTo;
                     bool alreadyAssigned = false;
                     for (auto it = manager.getMidiProgramAssignments().begin(); it != manager.getMidiProgramAssignments().end(); ++it)
                     {
@@ -237,6 +238,7 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
                         if (value == midiNum && chan == midiChan && key != presetName)
                         {
                             alreadyAssigned = true;
+                            alreadyAssignedTo = key;
                             break;
                         }
                     }
@@ -246,7 +248,7 @@ void PresetPanel::mouseUp(const juce::MouseEvent& e)
                     } else {
                         juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
                             "MIDI Program Assignment",
-                            "This MIDI program channel combo is already assigned to another preset.");
+                            "This MIDI program channel combo is already assigned to another preset called: '" + alreadyAssignedTo + "'");
                     }
                     repaint();
                 },
