@@ -151,6 +151,7 @@ juce::StringArray PresetManager::getAllPresets() {
   for (const auto &file : fileArray) {
     presets.add(file.getFileNameWithoutExtension());
   }
+  presets.sort(true);
   return presets;
 }
 

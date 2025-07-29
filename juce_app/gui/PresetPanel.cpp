@@ -1,6 +1,6 @@
 #include "PresetPanel.h"
 #include "juce_gui_extra/juce_gui_extra.h"
-#include "MidiAssignComponent.h" // Make sure this header exists and is in your include path
+#include "MidiAssignComponent.h" 
 
 PresetPanel::PresetPanel(PresetManager& presetManager, std::function<void()> onClose)
     : manager(presetManager), onCloseCallback(onClose)
@@ -33,8 +33,7 @@ PresetPanel::PresetPanel(PresetManager& presetManager, std::function<void()> onC
 
 }
 
-void PresetPanel::refreshPresetList()
-{
+void PresetPanel::refreshPresetList(){
     auto allPresets = manager.getAllPresets();
 
     presets.clear();
